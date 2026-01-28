@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+
+
+// ============================================
+// MAIN MODELS
+// ============================================
+
+model Product {
+  id              String   @id @default(cuid())
+  shopifyProductId String  @unique
+  name            String
+  basePrice       Float    @default(0)
+  
+  // Relations
+  steps           ConfigurationStep[]
+  priceMatrices   PriceMatrix[]
+  orders          OrderConfiguration[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("products")
+}
+
+model ConfigurationStep {
+  id          String   @id @default(cuid())
+  productId   String
+  key         String   // unique key like "fenstertyp", "befestigung"
+  type        String   // "OPTIONS" or "MEASUREMENT"
+  
+  title       String
+  subtitle    String?
+  description String?
+  image       String?
+  order       Int      // sequence number
+  
+  // For measurement type steps
+  widthMin    Int?
+  widthMax    Int?
+  heightMin   Int?
+  heightMax   Int?
+  
+  // Relations
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  options     StepOption[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([productId, key])
+  @@map("configuration_steps")
+}
+
+model StepOption {
+  id          String   @id @default(cuid())
+  stepId      String
+  value       String   // unique value like "normal", "dachfenster"
+  label       String
+  description String?
+  image       String?
+  price       Float    @default(0)  // addon price
+  
+  // Conditional flow - JSON string of step keys
+  showSteps   String?  // JSON: ["befestigung", "masse", "befestigung_test_1"]
+  
+  // Relations
+  step        ConfigurationStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([stepId, value])
+  @@map("step_options")
+}
+
+model PriceMatrix {
+  id          String   @id @default(cuid())
+  productId   String
+  
+  // Width range (Input 1)
+  widthMin    Int
+  widthMax    Int
+  
+  // Height range (Input 2)
+  heightMin   Int
+  heightMax   Int
+  
+  price       Float
+  
+  // Relations
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("price_matrices")
+}
+
+model OrderConfiguration {
+  id              String   @id @default(cuid())
+  productId       String
+  orderId         String?  // Shopify order ID
+  
+  // Store complete configuration as JSON strings
+  selections      String   // JSON: {"fenstertyp": "normal", "befestigung": "schrauben"}
+  measurements    String?  // JSON: {"breite": 750, "hoehe": 850}
+  
+  quantity        Int      @default(1)
+  calculatedPrice Float
+  
+  // Relations
+  product         Product  @relation(fields: [productId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("order_configurations")
+}

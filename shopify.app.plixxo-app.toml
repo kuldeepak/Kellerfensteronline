@@ -1,0 +1,19 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "5683f1c6f7d96655f44824596125b904"
+name = "plixxo-app"
+application_url = "https://hierarchy-vary-cited-colored.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2026-04"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products , write_files"
+
+[auth]
+redirect_urls = [ "https://hierarchy-vary-cited-colored.trycloudflare.com/api/auth" ]
