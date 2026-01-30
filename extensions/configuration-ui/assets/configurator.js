@@ -11,7 +11,7 @@ let PRODUCT_ID = null; // Shopify Product ID
 
 async function loadConfiguration(productId) {
     try {
-        const response = await fetch(`https://richardson-thumbs-briefly-humidity.trycloudflare.com/api/public/configurator/${productId}`);
+        const response = await fetch(`https://texts-videos-know-crystal.trycloudflare.com/api/public/configurator/${productId}`);
         const data = await response.json();
 
         if (!data.success) {
@@ -30,7 +30,7 @@ async function loadConfiguration(productId) {
 
 async function calculatePrice(productId, selections, measurements, quantity) {
     try {
-        const response = await fetch(`https://richardson-thumbs-briefly-humidity.trycloudflare.com/api/public/calculate-price`, {
+        const response = await fetch(`https://texts-videos-know-crystal.trycloudflare.com/api/public/calculate-price`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -596,6 +596,205 @@ document.addEventListener("DOMContentLoaded", async function () {
           `);
         });
     }
+
+
+
+
+    // for add to cart
+    /* =====================================================
+       ADD TO CART - WITH PRODUCT CREATION
+    ===================================================== */
+
+    async function addToCart() {
+        if (!isConfigurationComplete()) {
+            alert('Bitte vervollständigen Sie alle Schritte vor dem Hinzufügen zum Warenkorb');
+            return;
+        }
+
+        const addToCartBtn = document.querySelector('.add-to-cart-btn');
+        if (addToCartBtn) {
+            addToCartBtn.disabled = true;
+            addToCartBtn.innerHTML = '<span style="display: inline-block; animation: spin 1s linear infinite;">⌛</span> Produkt wird erstellt...';
+        }
+
+        try {
+            // Step 1: Calculate final price
+            const finalPrice = await calculatePrice(
+                PRODUCT_ID,
+                state.selections,
+                state.measurements,
+                1
+            );
+
+            console.log('Final Price:', finalPrice);
+
+            const baseProductTitle = PRODUCT_CONFIG.product.name || 'Configured Product';
+
+            // Step 2: Get product image (optional - use first selected option's image)
+            let productImage = null;
+            const el = document.querySelector('.zoom-thumb');
+            const imgUrl = el.dataset.url;
+            if (state.selections) {
+                for (const [stepKey, selectedValue] of Object.entries(state.selections)) {
+                    const step = PRODUCT_CONFIG.steps.find(s => s.key === stepKey);
+                    if (step && step.options) {
+                        const option = step.options.find(o => o.value === selectedValue);
+                        if (option && option.image) {
+                            productImage = option.image;
+                            break; // Use first available image
+                        }
+                    }
+                }
+            }
+
+            // Step 3: Create product via App Proxy
+            const createResponse = await fetch('/apps/cartApi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: PRODUCT_ID,
+                    selections: state.selections,
+                    measurements: state.measurements,
+                    quantity: state.menge,
+                    calculatedPrice: finalPrice,
+                    baseProductTitle: baseProductTitle,
+                    productImage: imgUrl,
+                })
+            });
+
+            const createData = await createResponse.json();
+
+            console.log('Create Product Response:', createData);
+
+            if (!createData.success) {
+                throw new Error(createData.error || 'Failed to create product');
+            }
+
+            // Step 4: Extract variant ID
+            let variantId = createData.shopifyProduct.variantId;
+
+            // Shopify Cart API needs numeric ID
+            if (variantId.includes('gid://')) {
+                variantId = variantId.split('/').pop();
+            }
+
+            console.log('Adding variant to cart:', variantId);
+
+            // Step 5: Add to cart
+            const cartResponse = await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    items: [{
+                        id: variantId,
+                        quantity: state.menge,
+                        properties: {
+                            // selections
+                            ...Object.fromEntries(
+                                Object.entries(state.selections).map(
+                                    ([key, value]) => [`${key}`, String(value)]
+                                )
+                            ),
+
+                            // measurements
+                            ...Object.fromEntries(
+                                Object.entries(state.measurements).map(
+                                    ([key, value]) => [`${key}`, String(value)]
+                                )
+                            ),
+                        }
+                    }]
+                })
+            });
+
+            if (!cartResponse.ok) {
+                const errorText = await cartResponse.text();
+                console.error('Cart API Error:', errorText);
+                throw new Error(`Failed to add to cart: ${errorText}`);
+            }
+
+            const cartResult = await cartResponse.json();
+            console.log('Cart Result:', cartResult);
+
+            // Step 6: Success!
+            showSuccessMessage(createData.shopifyProduct.title);
+
+            setTimeout(() => {
+                window.location.href = '/cart';
+            }, 1500);
+
+        } catch (error) {
+            console.error('Add to Cart Error:', error);
+            alert(`Fehler: ${error.message}`);
+
+            if (addToCartBtn) {
+                addToCartBtn.disabled = false;
+                addToCartBtn.innerHTML = 'IN DEN WARENKORB';
+            }
+        }
+    }
+
+    function isConfigurationComplete() {
+        const requiredSteps = activeFlow.length > 0 ? activeFlow : PRODUCT_CONFIG.steps.map(s => s.key);
+
+        for (const stepKey of requiredSteps) {
+            const step = PRODUCT_CONFIG.steps.find(s => s.key === stepKey);
+
+            if (!step) continue;
+
+            if (step.type === 'options') {
+                if (!state.selections[stepKey]) {
+                    console.log('Missing selection for:', stepKey);
+                    return false;
+                }
+            }
+
+            if (step.type === 'measurement') {
+                if (!state.measurements.breite || !state.measurements.hoehe) {
+                    console.log('Missing measurements');
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    function showSuccessMessage(productTitle) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        max-width: 400px;
+    `;
+
+        notification.innerHTML = `
+        <h3 style="margin: 0 0 10px 0; font-size: 18px;">✓ Produkt erstellt!</h3>
+        <p style="margin: 0; font-size: 14px;">${productTitle}</p>
+        <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Wird zum Warenkorb hinzugefügt...</p>
+    `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+
+    // Add to cart button event listener
+    document.querySelector('.add-to-cart-btn')?.addEventListener('click', addToCart);
 });
 
 document.querySelector(".zoom-thumb")?.addEventListener("mousemove", (e) => {

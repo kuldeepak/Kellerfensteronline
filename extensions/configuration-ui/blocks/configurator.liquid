@@ -1,3 +1,5 @@
+
+{{ 'configurator.css' | asset_url | stylesheet_tag }}
 <div class="config-wrapper">
   <!-- LEFT SIDE -->
   <div class="configurator-steps config-left" id="configuratorSteps" data-product-id="123456789">
@@ -40,7 +42,7 @@
         <button class="qty-plus">+</button>
       </div>
 
-      <button class="primary-btn">IN DEN WARENKORB</button>
+      <button class="primary-btn add-to-cart-btn">IN DEN WARENKORB</button>
     </div>
   </div>
 
@@ -49,7 +51,7 @@
 
     <!-- ZOOM -->
     <div class="zoom-wrapper">
-      <div class="zoom-thumb"
+      <div class="zoom-thumb" data-url="https://cdn.shopify.com/extensions/019beb25-408f-70b4-9af9-8e2ffef35c2f/dev-1c8b5b1a-7798-4b7e-9065-4707d76812ce/assets/123.jpg"
         style="background-image:url('https://cdn.shopify.com/extensions/019beb25-408f-70b4-9af9-8e2ffef35c2f/dev-1c8b5b1a-7798-4b7e-9065-4707d76812ce/assets/123.jpg');">
       </div>
 
@@ -76,7 +78,7 @@
   </div>
 </div>
 
-{{ 'configurator.css' | asset_url | stylesheet_tag }}
+
 {{ 'configurator.js' | asset_url | script_tag }}
 
 {% schema %}

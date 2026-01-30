@@ -1,25 +1,44 @@
-p, span, h1, h2, h3, h4, h5, h6, b, a, i, u, ul, li, table, td, th, td {
+p,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+a,
+i,
+u,
+ul,
+li,
+table,
+td,
+th,
+td {
     letter-spacing: 0;
 }
+
 img {
     width: 100%;
     max-width: 100%;
 }
+
 #shade-configurator {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 30px;
-  border: 1px solid #ddd;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    border: 1px solid #ddd;
 }
 
 #step-content {
-  margin: 20px 0;
-  font-size: 18px;
+    margin: 20px 0;
+    font-size: 18px;
 }
 
 .buttons {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 .config-step button {
@@ -52,10 +71,12 @@ img {
 .config-wrapper {
     display: flex;
 }
+
 .config-left {
     flex: 0 0 58.333333%;
     max-width: 58.333333%;
 }
+
 .config-right {
     max-width: 33.333333%;
     position: sticky;
@@ -63,6 +84,7 @@ img {
     height: fit-content;
     width: 100%;
 }
+
 .config-left .status {
     margin-bottom: 15px;
     font-size: 22px;
@@ -88,7 +110,19 @@ img {
     background-color: #E5C675;
     border-radius: 0px;
     font-family: 'Montserrat', sans-serif;
+    gap: 10px;
 }
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 
 .note {
     font-size: 10pt;
@@ -109,6 +143,7 @@ img {
     font-size: 16px;
     font-weight: bold;
 }
+
 .config-table td {
     padding: 0.75rem;
     vertical-align: top;
@@ -117,10 +152,12 @@ img {
     font-weight: 500;
     letter-spacing: 0;
 }
+
 .config-wabenplissee {
     display: flex;
     gap: 30px;
 }
+
 .config-wabenpl {
     max-width: 66.666667%;
 }
@@ -145,26 +182,31 @@ img {
 }
 
 .price-box .total {
-  font-size: 18px;
-  font-weight: bold;
+    font-size: 18px;
+    font-weight: bold;
 }
+
 .price-box div span {
     font-size: 16px;
     color: #212529;
     font-weight: 600;
 }
+
 .price-box div p {
     margin: 0px;
     color: #212529;
     font-size: 16px;
 }
+
 .preview-img {
-  width: 100%;
-  border: 1px solid #ddd;
+    width: 100%;
+    border: 1px solid #ddd;
 }
+
 .config-right {
     margin-left: 123px;
 }
+
 .config-right .summary-box {
     padding: 15px;
     position: relative;
@@ -177,9 +219,12 @@ img {
     padding-left: 3%;
     padding-right: 3%;
 }
-.config-right img, .config-table-img img {
+
+.config-right img,
+.config-table-img img {
     display: block;
 }
+
 .config-right .summary-box h3 {
     font-size: 22px;
     line-height: 31px;
@@ -215,11 +260,13 @@ img {
     border: 1px solid #e4e5ec;
     transition: border 0.3s, box-shadow 0.3s;
 }
+
 .config-step3 input[type="number"]:focus {
     outline: none;
     border-color: #e5c675;
     box-shadow: 0 0 0 3px rgb(186 188 191 / 15%);
 }
+
 .config-step.config-step3 label {
     display: flex;
     flex-direction: column;
@@ -228,12 +275,14 @@ img {
     font-weight: 600;
     color: #000;
 }
+
 table.final-summary {
     width: 100%;
     border: 1px solid #dee2e6;
     border-collapse: collapse;
     margin-top: 16px;
 }
+
 .quantity.quantity__qty {
     display: inline-flex;
     align-items: stretch;
@@ -242,6 +291,7 @@ table.final-summary {
     gap: 10px;
     width: 25%;
 }
+
 .summary-price div {
     display: flex;
     justify-content: space-between;
@@ -249,6 +299,7 @@ table.final-summary {
     color: #000;
     font-size: 14px;
 }
+
 .summary-price span {
     font-size: 14px;
     color: #000;
@@ -265,12 +316,15 @@ table.final-summary {
     line-height: normal;
     border: 1px solid #dee2e6;
 }
+
 .quantity button:hover {
     background: #e0e0e0;
 }
+
 .quantity button:active {
     background: #ccc;
 }
+
 .quantity.quantity__qty .qty-value {
     width: 100%;
     /* width: 210px; */
@@ -282,9 +336,12 @@ table.final-summary {
     align-items: center;
     justify-content: center;
 }
-.quantity:after, .quantity:before {
+
+.quantity:after,
+.quantity:before {
     display: none;
 }
+
 .quantity.quantity__qty button {
     padding: 0;
     display: block !important;
@@ -310,12 +367,14 @@ table.final-summary tr td {
     text-align: right;
     text-transform: capitalize;
 }
+
 .summary-price-versand .summary-price {
     border: 1px solid #dee2e6;
     border-left: 0;
     border-right: 0;
     padding: 20px 0px;
 }
+
 .summary-price-versand .summary-price div {
     display: flex;
     justify-content: space-between;
@@ -324,6 +383,7 @@ table.final-summary tr td {
     color: #212529;
     padding-bottom: 0px;
 }
+
 .summary-price-versand .summary-price span {
     padding: 0px;
     border-top: 0px;
@@ -331,6 +391,7 @@ table.final-summary tr td {
     line-height: 17px;
     color: #212529;
 }
+
 .summary-price-versand .total {
     display: flex;
     justify-content: space-between;
@@ -342,25 +403,25 @@ table.final-summary tr td {
 
 /* Responsive */
 @media (max-width: 900px) {
-  .config-wrapper {
-    grid-template-columns: 1fr;
-  }
+    .config-wrapper {
+        grid-template-columns: 1fr;
+    }
 }
 
 
 /* GPT CSS */
 .cart-success-popup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
 }
 
 .cart-success-popup.active {
-  display: flex;
+    display: flex;
 }
 
 .cart-success-inner {
@@ -382,6 +443,7 @@ table.final-summary tr td {
     padding: 20px;
     text-align: center;
 }
+
 .cart-success-inner h3 {
     font-size: 28px;
     margin-bottom: 0.5rem !important;
@@ -440,41 +502,52 @@ p.question {
     letter-spacing: 0;
     line-height: 1.5;
 }
+
 @keyframes popupFade {
-  from { transform: scale(0.95); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .popup-close {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
 }
 
 
 
 .is-hidden {
-  display: none !important;
+    display: none !important;
 }
 
 
 
 .is-disabled {
-  opacity: 0.5;
-  pointer-events: none;
-  display: none;
+    opacity: 0.5;
+    pointer-events: none;
+    display: none;
 }
+
 .title-back-btn {
     margin-top: 24px;
 }
+
 .title-back-btn h1.title {
     font-size: 30px;
     margin: 0px 0px 8px 0px;
 }
+
 .title-back-btn img {
     max-width: fit-content;
 }
@@ -483,6 +556,7 @@ p.question {
     margin-bottom: 40px;
     margin-top: 45px;
 }
+
 .title-back-btn hr.main-sep {
     margin-top: 0px;
     margin-bottom: 26px;
@@ -495,14 +569,17 @@ p.question {
     padding: 15px;
     margin-bottom: 20px;
 }
+
 .image-div {
     display: table-cell;
     vertical-align: middle;
     padding-right: 15px;
 }
+
 .image-div img {
     max-width: 43px;
 }
+
 .custom-alert .text-div {
     font-size: 15px;
     text-align: justify;
@@ -530,12 +607,14 @@ label.option-card img {
     width: 24px;
     height: 24px;
 }
+
 .config-step h2 {
     font-size: 22px;
     color: #000000;
     text-align: center;
     line-height: 1.2;
     margin: 0 0px 5px 0px;
+    font-weight: 500;
 }
 
 .config-step p {
@@ -556,10 +635,12 @@ label.option-card span {
     display: flex;
     flex-direction: column;
 }
+
 .option-title1 {
     display: flex;
     gap: 6px;
 }
+
 label.option-card input {
     transform: scale(1.3);
     margin-right: 13px;
@@ -592,49 +673,53 @@ label.option-card input {
 
 /* Zoom preview (OUT OF FLOW) */
 .zoom-preview {
-  position: absolute;      /* ðŸ”¥ key fix */
-  top: 0;
-  /* left: 180px;             place to the right */
-  right: 350px;
-  width: 320px;
-  height: 320px;
+    position: absolute;
+    /* ðŸ”¥ key fix */
+    top: 0;
+    /* left: 180px;             place to the right */
+    right: 350px;
+    width: 320px;
+    height: 320px;
 
-  background-repeat: no-repeat;
-  background-size: 300%;
-  background-position: center;
+    background-repeat: no-repeat;
+    background-size: 300%;
+    background-position: center;
 
-  border: 1px solid #ddd;
-  background-color: #fff;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: 1px solid #ddd;
+    background-color: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 
-  display: none;           /* hidden by default */
-  z-index: 9999999999999;           /* above everything */
+    display: none;
+    /* hidden by default */
+    z-index: 9999999999999;
+    /* above everything */
 }
 
 /* Show zoom WITHOUT moving layout */
 .zoom-wrapper:hover .zoom-preview {
-  display: block;
+    display: block;
 }
 
 .zoom-preview {
-  position: absolute;
-  top: 0;
-  /* left: 310px; */
-  right: 350px;
-  width: 320px;
-  height: 320px;
+    position: absolute;
+    top: 0;
+    /* left: 310px; */
+    right: 500px;
+    width: 320px;
+    height: 320px;
 
-  background-repeat: no-repeat;
-  background-size: 500%;
-  background-position: center;
+    background-repeat: no-repeat;
+    background-size: 500%;
+    background-position: center;
 
-  pointer-events: none; /* ðŸ”¥ CRITICAL */
-  z-index: 99999;
+    pointer-events: none;
+    /* ðŸ”¥ CRITICAL */
+    z-index: 99999;
 }
 
 .zoom-preview.is-left {
-  left: auto;
-  right: 500px;
+    left: auto;
+    right: 500px;
 }
 
 /***********************************/
@@ -645,8 +730,10 @@ label.option-card input {
 .step-content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
+    padding-top: 30px;
 }
+
 .option-inner {
     display: flex;
     gap: 20px;
@@ -654,18 +741,45 @@ label.option-card input {
     display: none;
     width: 100%;
 }
+
+.measure-field {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.measure-field label {
+    width: 100%;
+    font-size: 16px;
+    line-height: 21px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 10px;
+}
+
+.measure-field input {
+    width: 50%;
+    margin-top: 0px;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #e4e5ec;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
 .option-card:has(input[type="radio"]:checked) .option-inner {
     display: flex;
 }
+
 .option-text {
     padding-left: 30px;
     width: 50%;
 }
+
 .option-title {
     width: 100%;
     display: flex;
     align-items: center;
 }
+
 .option-title1 {
     display: flex;
     gap: 6px;
@@ -674,132 +788,153 @@ label.option-card input {
     font-weight: 600;
     color: #000;
 }
+
 .option-title img {
     width: 24px;
     height: 24px;
     float: right;
 }
+
 .option-description {
     font-size: 14px;
     line-height: normal;
     color: #000;
 }
+
 .option-card:hover {
     border: 1px solid #000000;
 }
+
 .option-image.main-img img {
     width: 100%;
     height: 100%;
 }
+
 [data-step="3"] input {
-  width: 50%;
-  padding: 10px 12px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 0px;
-  margin-top: 10px;
+    width: auto;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 0px;
+    margin-top: 0px;
 }
+
 [data-step="3"] div {
     font-size: 16px;
     line-height: 21px;
     font-weight: 600;
     color: #000;
-    margin-bottom: 20px;
+    margin-bottom: 0;
+    /* align-items: center; */
 }
+
 [data-step="3"] img {
     max-width: 470px;
     width: 100%;
-    margin-bottom: 16px;
+    margin-bottom: 0px;
 }
+
 [data-step="3"] label {
     display: flex;
     flex-direction: column;
 }
+
 @media (max-width: 900px) {
-.title-back-btn h1.title {
-    font-size: 18px;
-}
-.image-div {
-    width: 32px;
-    padding-top: 8px !important;
-    flex-shrink: 0;
-    padding: 0;
-    padding-right: 10px;
-}
-.custom-alert .text-div {
-    text-align: left;
-    flex: 1;
-}
-.config-wrapper {
-	grid-template-columns: 1fr;
-	flex-wrap: wrap;
-} 
-.config-left {
-    flex: 0 0 100%;
-    max-width: 100%;
-}
-.config-right {
-    margin-left: 0;
-    max-width: 100%;
-} 
-.option-image, .option-text {
-    width: 100% !important;
-    padding-left: 0px !important;
-} 
-.option-title1 {
-    font-size: 14px;
-    flex-wrap: wrap;
-}
-.option-card:has(input[type="radio"]:checked) .option-inner {
-    flex-direction: column-reverse;
-}
-[data-step="3"] input {
-    width: 100%;
-}
-.quantity.quantity__qty {
-    width: 45%;
-}
-.zoom-wrapper:hover .zoom-preview {
-    display: block;
-    display: none !important;
-}
+    .title-back-btn h1.title {
+        font-size: 18px;
+    }
+
+    .image-div {
+        width: 32px;
+        padding-top: 8px !important;
+        flex-shrink: 0;
+        padding: 0;
+        padding-right: 10px;
+    }
+
+    .custom-alert .text-div {
+        text-align: left;
+        flex: 1;
+    }
+
+    .config-wrapper {
+        grid-template-columns: 1fr;
+        flex-wrap: wrap;
+    }
+
+    .config-left {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .config-right {
+        margin-left: 0;
+        max-width: 100%;
+    }
+
+    .option-image,
+    .option-text {
+        width: 100% !important;
+        padding-left: 0px !important;
+    }
+
+    .option-title1 {
+        font-size: 14px;
+        flex-wrap: wrap;
+    }
+
+    .option-card:has(input[type="radio"]:checked) .option-inner {
+        flex-direction: column-reverse;
+    }
+
+    [data-step="3"] input {
+        width: 100%;
+    }
+
+    .quantity.quantity__qty {
+        width: 45%;
+    }
+
+    .zoom-wrapper:hover .zoom-preview {
+        display: block;
+        display: none !important;
+    }
 }
 
 /* Added By sharif */
 
 .measure-field {
     margin-bottom: 16px;
-  }
-  
-  .measure-field input.error {
+}
+
+.measure-field input.error {
     border: 2px solid #d32f2f;
     background: #fff5f5;
-  }
-  
-  .measure-error {
+}
+
+.measure-error {
     color: #d32f2f;
     font-size: 13px;
     margin-top: 6px;
     display: none;
-  }
-  
+}
 
-  .option-zoom {
+
+.option-zoom {
     position: relative;
     overflow: hidden;
-  }
-  
-  .option-zoom img {
+}
+
+.option-zoom img {
     width: 100%;
     height: auto;
     transform-origin: center center;
     transition: transform 0.1s ease;
     will-change: transform;
     cursor: zoom-in;
-  }
-  
+}
 
-  .config-step.is-hidden {
+
+.config-step.is-hidden {
     display: none;
-  }
-  
+}

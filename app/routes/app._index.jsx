@@ -91,9 +91,9 @@ export default function Index() {
 
   return (
     <s-page heading="Shopify app template">
-      <s-button slot="primary-action" onClick={generateProduct}>
+      {/* <s-button slot="primary-action" onClick={generateProduct}>
         Generate a product
-      </s-button>
+      </s-button> */}
 
       <s-section heading="Congrats on creating a new Shopify app 🎉">
         <s-paragraph>
@@ -116,7 +116,7 @@ export default function Index() {
           mutation demo, to provide a starting point for app development.
         </s-paragraph>
       </s-section>
-      <s-section heading="Get started with products">
+      {/* <s-section heading="Get started with products">
         <s-paragraph>
           Generate a product with GraphQL and get the JSON output for that
           product. Learn more about the{" "}
@@ -177,9 +177,9 @@ export default function Index() {
             </s-stack>
           </s-section>
         )}
-      </s-section>
+      </s-section> */}
 
-      <s-section slot="aside" heading="App template specs">
+      {/* <s-section slot="aside" heading="App template specs">
         <s-paragraph>
           <s-text>Framework: </s-text>
           <s-link href="https://reactrouter.com/" target="_blank">
@@ -210,9 +210,9 @@ export default function Index() {
             Prisma
           </s-link>
         </s-paragraph>
-      </s-section>
+      </s-section> */}
 
-      <s-section slot="aside" heading="Next steps">
+      {/* <s-section slot="aside" heading="Next steps">
         <s-unordered-list>
           <s-list-item>
             Build an{" "}
@@ -233,7 +233,7 @@ export default function Index() {
             </s-link>
           </s-list-item>
         </s-unordered-list>
-      </s-section>
+      </s-section> */}
     </s-page>
   );
 }

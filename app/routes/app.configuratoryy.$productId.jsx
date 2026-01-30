@@ -530,24 +530,25 @@ export default function ConfigureProduct() {
                                     <img src={option.image} alt={option.label} style={{ maxWidth: '150px', marginTop: '4px', borderRadius: '4px' }} />
                                   )}
                                 </s-stack>
-                                <s-stack direction="inline" gap="tight">
-                                  <s-button
-                                    variant="secondary"
-                                    onClick={() => {
-                                      setShowOptionForm(step.id);
-                                      handleEditOption(option);
-                                    }}
-                                  >
-                                    Edit
-                                  </s-button>
-                                  <s-button
-                                    variant="tertiary"
-                                    tone="critical"
-                                    onClick={() => handleDeleteOption(option.id)}
-                                  >
-                                    Delete
-                                  </s-button>
-                                </s-stack>
+
+                              </s-stack>
+                              <s-stack direction="inline" gap="tight">
+                                <s-button
+                                  variant="secondary"
+                                  onClick={() => {
+                                    setShowOptionForm(step.id);
+                                    handleEditOption(option);
+                                  }}
+                                >
+                                  Edit
+                                </s-button>
+                                <s-button
+                                  variant="tertiary"
+                                  tone="critical"
+                                  onClick={() => handleDeleteOption(option.id)}
+                                >
+                                  Delete
+                                </s-button>
                               </s-stack>
                             </s-box>
                           ))}
