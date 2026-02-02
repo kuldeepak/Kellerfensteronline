@@ -83,10 +83,10 @@ export const action = async ({ request }) => {
 
             // Find matching price in matrix
             const priceEntry = product.priceMatrices.find(pm =>
-                width >= pm.widthMin &&
-                width <= pm.widthMax &&
-                height >= pm.heightMin &&
-                height <= pm.heightMax
+                (width + 1) >= pm.widthMin &&
+                (width + 1) <= pm.widthMax &&
+                (height + 1) >= pm.heightMin &&
+                (height + 1) <= pm.heightMax
             );
 
             if (priceEntry) {
