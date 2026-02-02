@@ -230,6 +230,8 @@ img {
     line-height: 31px;
     margin-top: 15px;
     margin-bottom: 15px;
+    color: #000;
+    font-weight: 500;
 }
 
 .config-right .summary-box ul {
@@ -315,6 +317,7 @@ table.final-summary {
     transition: background 0.2s;
     line-height: normal;
     border: 1px solid #dee2e6;
+    height: 50px;
 }
 
 .quantity button:hover {
@@ -356,7 +359,7 @@ table.final-summary td:first-child {
 }
 
 table.final-summary tr td {
-    padding: 10px 20px;
+    padding: 13px 20px;
     vertical-align: top;
     border-top: 1px solid #dee2e6;
     color: #000;
@@ -577,7 +580,7 @@ p.question {
 }
 
 .image-div img {
-    max-width: 43px;
+    max-width: 33px;
 }
 
 .custom-alert .text-div {
@@ -819,14 +822,29 @@ label.option-card input {
     margin-top: 0px;
 }
 
-[data-step="3"] div {
+.option-description {
+    font-size: 16px;
+    line-height: 21px;
+    font-weight: 400;
+    color: #000;
+    margin-bottom: 0;
+    letter-spacing: 0px;
+}
+
+.heading_content_div_1 {
+    font-size: 16px;
+    color: #000;
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+
+/* [data-step="3"] div {
     font-size: 16px;
     line-height: 21px;
     font-weight: 600;
     color: #000;
     margin-bottom: 0;
-    /* align-items: center; */
-}
+} */
 
 [data-step="3"] img {
     max-width: 470px;
@@ -837,6 +855,10 @@ label.option-card input {
 [data-step="3"] label {
     display: flex;
     flex-direction: column;
+}
+
+.option-image.main-img .option-zoom {
+    width: 100%;
 }
 
 @media (max-width: 900px) {
@@ -875,7 +897,11 @@ label.option-card input {
     .option-image,
     .option-text {
         width: 100% !important;
-        padding-left: 0px !important;
+        padding-left: 30px !important;
+    }
+
+    .measure-field input {
+        width: 100%;
     }
 
     .option-title1 {
@@ -888,11 +914,15 @@ label.option-card input {
     }
 
     [data-step="3"] input {
-        width: 100%;
+        width: auto;
     }
 
     .quantity.quantity__qty {
         width: 45%;
+    }
+
+    .option-image.main-img img {
+        max-width: 100%;
     }
 
     .zoom-wrapper:hover .zoom-preview {
@@ -923,6 +953,7 @@ label.option-card input {
 .option-zoom {
     position: relative;
     overflow: hidden;
+    width: 60%;
 }
 
 .option-zoom img {
@@ -937,4 +968,15 @@ label.option-card input {
 
 .config-step.is-hidden {
     display: none;
+}
+
+.button_back {
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    gap: 4px;
+}
+
+.shopify-block.shopify-app-block {
+    width: 100%;
 }

@@ -69,11 +69,11 @@ function createStepShell(step, index) {
       <div class="config-step ${index !== 0 ? "is-disabled" : ""}"
            data-step="${index + 1}"
            data-step-key="${step.key}">
-  
+    <div class="heading_content_div">
         <h2>${step.title}</h2>
         <p>${step.subtitle || ''}</p>
-  
-        ${step.description ? `<div>${step.description}</div>` : ""}
+  </div>
+        ${step.description ? `<div class="heading_content_div_1">${step.description}</div>` : ""}
         ${step.image ? `<div class="option-zoom"> <img src="${step.image}"> </div>` : ""}
   
         <div class="step-content"></div>
@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     /* 1️⃣ Render steps */
     renderDynamicSteps(PRODUCT_CONFIG);
-    buildSummaries(PRODUCT_CONFIG);
+    //buildSummaries(PRODUCT_CONFIG);
 
     /* 2️⃣ Cache steps AFTER render */
     const steps = document.querySelectorAll(".config-step");

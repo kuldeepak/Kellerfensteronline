@@ -40,34 +40,10 @@ export const action = async ({ request, params }) => {
 
   try {
     // ============================================
-    // CREATE PRICE MATRIX ENTRY
+    // SAVE PIVOT TABLE
     // ============================================
-    if (actionType === "createPriceMatrix") {
-      const widthMin = parseInt(formData.get("widthMin"));
-      const widthMax = parseInt(formData.get("widthMax"));
-      const heightMin = parseInt(formData.get("heightMin"));
-      const heightMax = parseInt(formData.get("heightMax"));
-      const price = parseFloat(formData.get("price"));
-
-      const priceMatrix = await prisma.priceMatrix.create({
-        data: {
-          productId,
-          widthMin,
-          widthMax,
-          heightMin,
-          heightMax,
-          price,
-        },
-      });
-
-      return json({ success: true, priceMatrix });
-    }
-
-    // ============================================
-    // BULK CREATE PRICE MATRIX (Excel import)
-    // ============================================
-    if (actionType === "bulkCreatePriceMatrix") {
-      const bulkData = JSON.parse(formData.get("bulkData"));
+    if (actionType === "savePivotTable") {
+      const pivotData = JSON.parse(formData.get("pivotData"));
 
       // Delete existing entries for this product
       await prisma.priceMatrix.deleteMany({
@@ -76,7 +52,7 @@ export const action = async ({ request, params }) => {
 
       // Create new entries
       const created = await prisma.priceMatrix.createMany({
-        data: bulkData.map((item) => ({
+        data: pivotData.map((item) => ({
           productId,
           widthMin: item.widthMin,
           widthMax: item.widthMax,
@@ -87,19 +63,6 @@ export const action = async ({ request, params }) => {
       });
 
       return json({ success: true, count: created.count });
-    }
-
-    // ============================================
-    // DELETE PRICE MATRIX ENTRY
-    // ============================================
-    if (actionType === "deletePriceMatrix") {
-      const priceMatrixId = formData.get("priceMatrixId");
-
-      await prisma.priceMatrix.delete({
-        where: { id: priceMatrixId },
-      });
-
-      return json({ success: true });
     }
 
     // ============================================
@@ -125,97 +88,90 @@ export default function PricingMatrix() {
   const fetcher = useFetcher();
   const navigate = useNavigate();
   const shopify = useAppBridge();
+  const revalidator = useRevalidator();
 
-  const [showForm, setShowForm] = useState(false);
-  const [showBulkImport, setShowBulkImport] = useState(false);
-  const [formData, setFormData] = useState({
-    widthMin: "",
-    widthMax: "",
-    heightMin: "",
-    heightMax: "",
-    price: "",
-  });
-  const [bulkImportText, setBulkImportText] = useState("");
+  // Default ranges
+  const defaultWidthRanges = [400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300];
+  const defaultHeightRanges = [500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800];
+
+  // State for editable pivot table
+  const [widthRanges, setWidthRanges] = useState(defaultWidthRanges);
+  const [heightRanges, setHeightRanges] = useState(defaultHeightRanges);
+  const [pivotTable, setPivotTable] = useState({});
+  const [editingCell, setEditingCell] = useState(null);
 
   const isLoading = ["loading", "submitting"].includes(fetcher.state);
-  const revalidator = useRevalidator();
+
+  // Initialize pivot table from existing data
+  useEffect(() => {
+    if (product?.priceMatrices?.length > 0) {
+      const newPivotTable = {};
+      const widthSet = new Set();
+      const heightSet = new Set();
+
+      product.priceMatrices.forEach((pm) => {
+        widthSet.add(pm.widthMin);
+        heightSet.add(pm.heightMin);
+        const key = `${pm.widthMin}-${pm.heightMin}`;
+        newPivotTable[key] = pm.price;
+      });
+
+      if (widthSet.size > 0) setWidthRanges([...widthSet].sort((a, b) => a - b));
+      if (heightSet.size > 0) setHeightRanges([...heightSet].sort((a, b) => a - b));
+      setPivotTable(newPivotTable);
+    }
+  }, [product]);
 
   useEffect(() => {
     if (fetcher.data?.success) {
-      shopify.toast.show("Success!");
-      setShowForm(false);
-      setShowBulkImport(false);
-      setFormData({
-        widthMin: "",
-        widthMax: "",
-        heightMin: "",
-        heightMax: "",
-        price: "",
-      });
-      setBulkImportText("");
-      //   window.location.reload();
+      shopify.toast.show("Pricing matrix saved successfully!");
       revalidator.revalidate();
     } else if (fetcher.data?.error) {
       shopify.toast.show(`Error: ${fetcher.data.error}`);
     }
   }, [fetcher.data, shopify]);
 
-  const handleCreateEntry = () => {
+  const handleSavePivotTable = () => {
+    const pivotData = [];
+
+    heightRanges.forEach((heightMin, hIdx) => {
+      const heightMax = hIdx < heightRanges.length - 1 ? heightRanges[hIdx + 1] : heightMin + 100;
+
+      widthRanges.forEach((widthMin, wIdx) => {
+        const widthMax = wIdx < widthRanges.length - 1 ? widthRanges[wIdx + 1] : widthMin + 100;
+        const key = `${widthMin}-${heightMin}`;
+        const price = pivotTable[key];
+
+        if (price && !isNaN(parseFloat(price))) {
+          pivotData.push({
+            widthMin,
+            widthMax,
+            heightMin,
+            heightMax,
+            price: parseFloat(price),
+          });
+        }
+      });
+    });
+
+    if (pivotData.length === 0) {
+      shopify.toast.show("No valid pricing data to save");
+      return;
+    }
+
     const submitData = new FormData();
-    submitData.append("action", "createPriceMatrix");
-    submitData.append("widthMin", formData.widthMin);
-    submitData.append("widthMax", formData.widthMax);
-    submitData.append("heightMin", formData.heightMin);
-    submitData.append("heightMax", formData.heightMax);
-    submitData.append("price", formData.price);
+    submitData.append("action", "savePivotTable");
+    submitData.append("pivotData", JSON.stringify(pivotData));
 
     fetcher.submit(submitData, { method: "POST" });
   };
 
-  const handleBulkImport = () => {
-    try {
-      // Parse CSV-like format
-      const lines = bulkImportText.trim().split("\n");
-      const bulkData = [];
-
-      for (const line of lines) {
-        const [widthMin, widthMax, heightMin, heightMax, price] = line
-          .split(",")
-          .map((s) => s.trim());
-
-        if (widthMin && widthMax && heightMin && heightMax && price) {
-          bulkData.push({
-            widthMin: parseInt(widthMin),
-            widthMax: parseInt(widthMax),
-            heightMin: parseInt(heightMin),
-            heightMax: parseInt(heightMax),
-            price: parseFloat(price),
-          });
-        }
-      }
-
-      if (bulkData.length === 0) {
-        shopify.toast.show("No valid data found");
-        return;
-      }
-
-      const submitData = new FormData();
-      submitData.append("action", "bulkCreatePriceMatrix");
-      submitData.append("bulkData", JSON.stringify(bulkData));
-
-      fetcher.submit(submitData, { method: "POST" });
-    } catch (error) {
-      shopify.toast.show(`Parse Error: ${error.message}`);
-    }
-  };
-
-  const handleDeleteEntry = (priceMatrixId) => {
-    if (confirm("Delete this pricing entry?")) {
-      const submitData = new FormData();
-      submitData.append("action", "deletePriceMatrix");
-      submitData.append("priceMatrixId", priceMatrixId);
-      fetcher.submit(submitData, { method: "POST" });
-    }
+  const handleCellChange = (widthMin, heightMin, value) => {
+    const key = `${widthMin}-${heightMin}`;
+    setPivotTable({
+      ...pivotTable,
+      [key]: value,
+    });
   };
 
   const handleDeleteAll = () => {
@@ -227,7 +183,80 @@ export default function PricingMatrix() {
       const submitData = new FormData();
       submitData.append("action", "deleteAllPriceMatrices");
       fetcher.submit(submitData, { method: "POST" });
+      setPivotTable({});
     }
+  };
+
+  const addWidthRange = () => {
+    const newWidth = widthRanges.length > 0 ? widthRanges[widthRanges.length - 1] + 100 : 400;
+    setWidthRanges([...widthRanges, newWidth]);
+  };
+
+  const addHeightRange = () => {
+    const newHeight = heightRanges.length > 0 ? heightRanges[heightRanges.length - 1] + 100 : 500;
+    setHeightRanges([...heightRanges, newHeight]);
+  };
+
+  const removeWidthRange = (width) => {
+    if (widthRanges.length <= 1) {
+      shopify.toast.show("Must have at least one width range");
+      return;
+    }
+    setWidthRanges(widthRanges.filter(w => w !== width));
+    // Clean up pivot table
+    const newPivotTable = { ...pivotTable };
+    heightRanges.forEach(h => {
+      delete newPivotTable[`${width}-${h}`];
+    });
+    setPivotTable(newPivotTable);
+  };
+
+  const removeHeightRange = (height) => {
+    if (heightRanges.length <= 1) {
+      shopify.toast.show("Must have at least one height range");
+      return;
+    }
+    setHeightRanges(heightRanges.filter(h => h !== height));
+    // Clean up pivot table
+    const newPivotTable = { ...pivotTable };
+    widthRanges.forEach(w => {
+      delete newPivotTable[`${w}-${height}`];
+    });
+    setPivotTable(newPivotTable);
+  };
+
+  const updateWidthRange = (oldWidth, newWidth) => {
+    const newValue = parseInt(newWidth);
+    if (isNaN(newValue) || newValue <= 0) return;
+
+    const newWidthRanges = widthRanges.map(w => w === oldWidth ? newValue : w);
+    setWidthRanges(newWidthRanges.sort((a, b) => a - b));
+
+    // Update pivot table keys
+    const newPivotTable = {};
+    Object.keys(pivotTable).forEach(key => {
+      const [w, h] = key.split('-').map(Number);
+      const newKey = `${w === oldWidth ? newValue : w}-${h}`;
+      newPivotTable[newKey] = pivotTable[key];
+    });
+    setPivotTable(newPivotTable);
+  };
+
+  const updateHeightRange = (oldHeight, newHeight) => {
+    const newValue = parseInt(newHeight);
+    if (isNaN(newValue) || newValue <= 0) return;
+
+    const newHeightRanges = heightRanges.map(h => h === oldHeight ? newValue : h);
+    setHeightRanges(newHeightRanges.sort((a, b) => a - b));
+
+    // Update pivot table keys
+    const newPivotTable = {};
+    Object.keys(pivotTable).forEach(key => {
+      const [w, h] = key.split('-').map(Number);
+      const newKey = `${w}-${h === oldHeight ? newValue : h}`;
+      newPivotTable[newKey] = pivotTable[key];
+    });
+    setPivotTable(newPivotTable);
   };
 
   if (!product) {
@@ -242,16 +271,6 @@ export default function PricingMatrix() {
       </s-page>
     );
   }
-
-  // Group by width range for better display
-  const groupedPrices = {};
-  product.priceMatrices.forEach((pm) => {
-    const key = `${pm.widthMin}-${pm.widthMax}`;
-    if (!groupedPrices[key]) {
-      groupedPrices[key] = [];
-    }
-    groupedPrices[key].push(pm);
-  });
 
   return (
     <s-page heading={`Pricing Matrix: ${product.name}`}>
@@ -269,291 +288,256 @@ export default function PricingMatrix() {
           </s-text>
           <s-text>
             <strong>Total Pricing Entries:</strong>{" "}
-            {product.priceMatrices.length}
+            {Object.keys(pivotTable).filter(k => pivotTable[k]).length}
           </s-text>
         </s-stack>
       </s-section>
 
-      <s-section heading="Pricing Matrix Entries">
+      <s-section heading="Editable Pricing Matrix">
         <s-stack direction="block" gap="base">
-          {product.priceMatrices.length === 0 ? (
-            <s-box padding="base" borderWidth="base" borderRadius="base">
-              <s-paragraph>
-                No pricing entries yet. Add entries below or use bulk import.
-              </s-paragraph>
-            </s-box>
-          ) : (
-            <>
-              <s-stack direction="inline" gap="base">
-                <s-button
-                  variant="tertiary"
-                  tone="critical"
-                  onClick={handleDeleteAll}
-                >
-                  Delete All Entries
-                </s-button>
-              </s-stack>
-
-              {Object.keys(groupedPrices).map((widthRange) => (
-                <s-box
-                  key={widthRange}
-                  padding="base"
-                  borderWidth="base"
-                  borderRadius="base"
-                >
-                  <s-stack direction="block" gap="tight">
-                    <s-heading variant="headingSm">
-                      Width: {widthRange} mm
-                    </s-heading>
-
-                    <div style={{ overflowX: "auto" }}>
-                      <table
-                        style={{
-                          width: "100%",
-                          borderCollapse: "collapse",
-                          fontSize: "14px",
-                        }}
-                      >
-                        <thead>
-                          <tr style={{ borderBottom: "2px solid #ddd" }}>
-                            <th style={{ padding: "8px", textAlign: "left" }}>
-                              Height Range (mm)
-                            </th>
-                            <th style={{ padding: "8px", textAlign: "right" }}>
-                              Price (€)
-                            </th>
-                            <th style={{ padding: "8px", textAlign: "center" }}>
-                              Actions
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {groupedPrices[widthRange].map((pm) => (
-                            <tr
-                              key={pm.id}
-                              style={{ borderBottom: "1px solid #eee" }}
-                            >
-                              <td style={{ padding: "8px" }}>
-                                {pm.heightMin} - {pm.heightMax}
-                              </td>
-                              <td
-                                style={{ padding: "8px", textAlign: "right" }}
-                              >
-                                {pm.price.toFixed(2)}
-                              </td>
-                              <td
-                                style={{ padding: "8px", textAlign: "center" }}
-                              >
-                                <button
-                                  onClick={() => handleDeleteEntry(pm.id)}
-                                  style={{
-                                    background: "transparent",
-                                    border: "none",
-                                    color: "#bf0711",
-                                    cursor: "pointer",
-                                    fontSize: "12px",
-                                    textDecoration: "underline",
-                                  }}
-                                >
-                                  Delete
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </s-stack>
-                </s-box>
-              ))}
-            </>
-          )}
-
           <s-stack direction="inline" gap="base">
-            <s-button onClick={() => setShowForm(!showForm)}>
-              {showForm ? "Cancel" : "Add Single Entry"}
+            <s-button
+              onClick={handleSavePivotTable}
+              {...(isLoading ? { loading: true } : {})}
+            >
+              Save All Changes
             </s-button>
             <s-button
-              variant="secondary"
-              onClick={() => setShowBulkImport(!showBulkImport)}
+              variant="tertiary"
+              tone="critical"
+              onClick={handleDeleteAll}
             >
-              {showBulkImport ? "Cancel Bulk Import" : "Bulk Import (CSV)"}
+              Delete All Entries
             </s-button>
           </s-stack>
 
-          {/* Single Entry Form */}
-          {showForm && (
-            <s-box padding="base" background="subdued" borderRadius="base">
-              <s-stack direction="block" gap="base">
-                <s-heading>Add Pricing Entry</s-heading>
-
-                <s-stack direction="inline" gap="base">
-                  <div style={{ width: "48%" }}>
-                    <s-text variant="bodySm">Width Min (mm)</s-text>
-                    <input
-                      type="number"
-                      value={formData.widthMin}
-                      onChange={(e) =>
-                        setFormData({ ...formData, widthMin: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        border: "1px solid #c9cccf",
-                        borderRadius: "4px",
-                        marginTop: "4px",
-                      }}
-                    />
-                  </div>
-                  <div style={{ width: "48%" }}>
-                    <s-text variant="bodySm">Width Max (mm)</s-text>
-                    <input
-                      type="number"
-                      value={formData.widthMax}
-                      onChange={(e) =>
-                        setFormData({ ...formData, widthMax: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        border: "1px solid #c9cccf",
-                        borderRadius: "4px",
-                        marginTop: "4px",
-                      }}
-                    />
-                  </div>
-                </s-stack>
-
-                <s-stack direction="inline" gap="base">
-                  <div style={{ width: "48%" }}>
-                    <s-text variant="bodySm">Height Min (mm)</s-text>
-                    <input
-                      type="number"
-                      value={formData.heightMin}
-                      onChange={(e) =>
-                        setFormData({ ...formData, heightMin: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        border: "1px solid #c9cccf",
-                        borderRadius: "4px",
-                        marginTop: "4px",
-                      }}
-                    />
-                  </div>
-                  <div style={{ width: "48%" }}>
-                    <s-text variant="bodySm">Height Max (mm)</s-text>
-                    <input
-                      type="number"
-                      value={formData.heightMax}
-                      onChange={(e) =>
-                        setFormData({ ...formData, heightMax: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        border: "1px solid #c9cccf",
-                        borderRadius: "4px",
-                        marginTop: "4px",
-                      }}
-                    />
-                  </div>
-                </s-stack>
-
-                <div>
-                  <s-text variant="bodySm">Price (€)</s-text>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) =>
-                      setFormData({ ...formData, price: e.target.value })
-                    }
+          <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "600px" }}>
+            <table
+              style={{
+                borderCollapse: "collapse",
+                fontSize: "13px",
+                minWidth: "100%",
+              }}
+            >
+              <thead style={{ position: "sticky", top: 0, background: "#f6f6f7", zIndex: 10 }}>
+                <tr>
+                  <th
                     style={{
-                      width: "100%",
-                      padding: "8px",
-                      border: "1px solid #c9cccf",
-                      borderRadius: "4px",
-                      marginTop: "4px",
+                      padding: "12px 8px",
+                      border: "2px solid #c9cccf",
+                      background: "#e3e4e6",
+                      position: "sticky",
+                      left: 0,
+                      zIndex: 11,
+                      minWidth: "120px",
                     }}
-                  />
-                </div>
-
-                <s-stack direction="inline" gap="base">
-                  <s-button
-                    onClick={handleCreateEntry}
-                    {...(isLoading ? { loading: true } : {})}
                   >
-                    Add Entry
-                  </s-button>
-                  <s-button
-                    variant="tertiary"
-                    onClick={() => setShowForm(false)}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span>Height (mm) →<br />Width (mm) ↓</span>
+                    </div>
+                  </th>
+                  {heightRanges.map((height, idx) => (
+                    <th
+                      key={height}
+                      style={{
+                        padding: "8px",
+                        border: "2px solid #c9cccf",
+                        background: "#5c6ac4",
+                        color: "white",
+                        minWidth: "100px",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                        <input
+                          type="number"
+                          value={height}
+                          onChange={(e) => updateHeightRange(height, e.target.value)}
+                          style={{
+                            width: "70px",
+                            padding: "4px",
+                            border: "1px solid white",
+                            borderRadius: "3px",
+                            textAlign: "center",
+                            fontWeight: "bold",
+                          }}
+                        />
+                        <button
+                          onClick={() => removeHeightRange(height)}
+                          style={{
+                            background: "rgba(255,255,255,0.2)",
+                            border: "1px solid white",
+                            color: "white",
+                            cursor: "pointer",
+                            fontSize: "10px",
+                            padding: "2px 6px",
+                            borderRadius: "3px",
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </th>
+                  ))}
+                  <th
+                    style={{
+                      padding: "8px",
+                      border: "2px solid #c9cccf",
+                      background: "#5c6ac4",
+                      color: "white",
+                    }}
                   >
-                    Cancel
-                  </s-button>
-                </s-stack>
-              </s-stack>
-            </s-box>
-          )}
+                    <button
+                      onClick={addHeightRange}
+                      style={{
+                        background: "rgba(255,255,255,0.2)",
+                        border: "1px solid white",
+                        color: "white",
+                        cursor: "pointer",
+                        fontSize: "16px",
+                        padding: "4px 12px",
+                        borderRadius: "3px",
+                      }}
+                    >
+                      +
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {widthRanges.map((width, wIdx) => (
+                  <tr key={width}>
+                    <td
+                      style={{
+                        padding: "8px",
+                        border: "2px solid #c9cccf",
+                        background: "#5c6ac4",
+                        color: "white",
+                        fontWeight: "bold",
+                        position: "sticky",
+                        left: 0,
+                        zIndex: 5,
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <input
+                          type="number"
+                          value={width}
+                          onChange={(e) => updateWidthRange(width, e.target.value)}
+                          style={{
+                            width: "70px",
+                            padding: "4px",
+                            border: "1px solid white",
+                            borderRadius: "3px",
+                            textAlign: "center",
+                            fontWeight: "bold",
+                          }}
+                        />
+                        <button
+                          onClick={() => removeWidthRange(width)}
+                          style={{
+                            background: "rgba(255,255,255,0.2)",
+                            border: "1px solid white",
+                            color: "white",
+                            cursor: "pointer",
+                            fontSize: "10px",
+                            padding: "2px 6px",
+                            borderRadius: "3px",
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </td>
+                    {heightRanges.map((height, hIdx) => {
+                      const key = `${width}-${height}`;
+                      const value = pivotTable[key] || "";
+                      const isEditing = editingCell === key;
 
-          {/* Bulk Import Form */}
-          {showBulkImport && (
-            <s-box padding="base" background="subdued" borderRadius="base">
-              <s-stack direction="block" gap="base">
-                <s-heading>Bulk Import (CSV Format)</s-heading>
-                <s-paragraph>
-                  Paste CSV data in format: widthMin, widthMax, heightMin,
-                  heightMax, price
-                  <br />
-                  Example: 500, 600, 400, 500, 31.57
-                </s-paragraph>
-
-                <textarea
-                  value={bulkImportText}
-                  onChange={(e) => setBulkImportText(e.target.value)}
-                  placeholder="500, 600, 400, 500, 31.57&#10;500, 600, 500, 600, 37.83&#10;500, 600, 600, 700, 44.34"
-                  rows="10"
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #c9cccf",
-                    borderRadius: "4px",
-                    fontFamily: "monospace",
-                    fontSize: "12px",
-                  }}
-                />
-
-                <s-stack direction="inline" gap="base">
-                  <s-button
-                    onClick={handleBulkImport}
-                    {...(isLoading ? { loading: true } : {})}
+                      return (
+                        <td
+                          key={key}
+                          style={{
+                            padding: "4px",
+                            border: "1px solid #c9cccf",
+                            background: value ? "#fff" : "#f9fafb",
+                            textAlign: "center",
+                          }}
+                          onClick={() => setEditingCell(key)}
+                        >
+                          <input
+                            type="text"
+                            value={value}
+                            onChange={(e) => handleCellChange(width, height, e.target.value)}
+                            onBlur={() => setEditingCell(null)}
+                            placeholder="€"
+                            style={{
+                              width: "100%",
+                              padding: "6px",
+                              border: isEditing ? "2px solid #5c6ac4" : "1px solid transparent",
+                              borderRadius: "3px",
+                              textAlign: "center",
+                              background: "transparent",
+                              fontSize: "13px",
+                            }}
+                          />
+                        </td>
+                      );
+                    })}
+                    <td style={{ padding: "8px", border: "2px solid #c9cccf" }}></td>
+                  </tr>
+                ))}
+                <tr>
+                  <td
+                    style={{
+                      padding: "8px",
+                      border: "2px solid #c9cccf",
+                      background: "#5c6ac4",
+                      color: "white",
+                      position: "sticky",
+                      left: 0,
+                      zIndex: 5,
+                    }}
                   >
-                    Import Data
-                  </s-button>
-                  <s-button
-                    variant="tertiary"
-                    onClick={() => setShowBulkImport(false)}
-                  >
-                    Cancel
-                  </s-button>
-                </s-stack>
-              </s-stack>
-            </s-box>
-          )}
+                    <button
+                      onClick={addWidthRange}
+                      style={{
+                        background: "rgba(255,255,255,0.2)",
+                        border: "1px solid white",
+                        color: "white",
+                        cursor: "pointer",
+                        fontSize: "16px",
+                        padding: "4px 12px",
+                        borderRadius: "3px",
+                        width: "100%",
+                      }}
+                    >
+                      +
+                    </button>
+                  </td>
+                  {heightRanges.map((h) => (
+                    <td key={h} style={{ padding: "8px", border: "2px solid #c9cccf" }}></td>
+                  ))}
+                  <td style={{ padding: "8px", border: "2px solid #c9cccf" }}></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <s-box padding="base" background="subdued" borderRadius="base">
+            <s-stack direction="block" gap="tight">
+              <s-text variant="bodySm">
+                <strong>Tips:</strong>
+              </s-text>
+              <s-unordered-list>
+                <s-list-item>Click any cell to edit the price directly</s-list-item>
+                <s-list-item>Click the header values to edit width/height ranges</s-list-item>
+                <s-list-item>Use + buttons to add new rows/columns</s-list-item>
+                <s-list-item>Use ✕ buttons to remove rows/columns</s-list-item>
+                <s-list-item>Click "Save All Changes" when done</s-list-item>
+              </s-unordered-list>
+            </s-stack>
+          </s-box>
         </s-stack>
-      </s-section>
-
-      <s-section slot="aside" heading="Instructions">
-        <s-unordered-list>
-          <s-list-item>Add individual pricing entries manually</s-list-item>
-          <s-list-item>Or use bulk import for Excel data</s-list-item>
-          <s-list-item>
-            Format: widthMin, widthMax, heightMin, heightMax, price
-          </s-list-item>
-          <s-list-item>Bulk import replaces all existing data</s-list-item>
-        </s-unordered-list>
       </s-section>
     </s-page>
   );
@@ -561,4 +545,4 @@ export default function PricingMatrix() {
 
 export const headers = (headersArgs) => {
   return boundary.headers(headersArgs);
-};
+};  
