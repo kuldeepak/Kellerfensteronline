@@ -76,30 +76,61 @@ export const action = async ({ request }) => {
         // ============================================
         // Calculate Measurement Price (from price matrix)
         // ============================================
-        let measurementPrice = 0;
-        if (measurements && measurements.breite && measurements.hoehe) {
+        // let measurementPrice = 0;
+        // if (measurements && measurements.breite && measurements.hoehe) {
+        //     const width = parseInt(measurements.breite);
+        //     const height = parseInt(measurements.hoehe);
+
+        //     // Find matching price in matrix
+        //     const priceEntry = product.priceMatrices.find(pm =>
+        //         width >= pm.widthMin &&
+        //         width <= pm.widthMax &&
+        //         height >= pm.heightMin &&
+        //         height <= pm.heightMax
+        //     );
+
+        //     if (priceEntry) {
+        //         measurementPrice = priceEntry.price;
+        //         totalPrice += measurementPrice;
+        //     } else {
+        //         // If no exact match, calculate based on area (fallback)
+        //         const area = (width * height) / 1000000; // mm² to m²
+        //         const pricePerSqM = 40; // Default price per square meter
+        //         measurementPrice = area * pricePerSqM;
+        //         totalPrice += measurementPrice;
+        //     }
+        // }
+
+        let measurementPrice = 10;
+
+        if (measurements?.breite && measurements?.hoehe) {
             const width = parseInt(measurements.breite);
             const height = parseInt(measurements.hoehe);
 
-            // Find matching price in matrix
+            // 1️⃣ Find nearest LOWER OR EQUAL width slab
+            const widthSlab = [...new Set(product.priceMatrices.map(pm => pm.widthMax))]
+                .filter(w => w <= width)
+                .sort((a, b) => b - a)[0]
+                ?? Math.min(...product.priceMatrices.map(pm => pm.widthMax));
+
+            // 2️⃣ Find nearest LOWER OR EQUAL height slab
+            const heightSlab = [...new Set(product.priceMatrices.map(pm => pm.heightMax))]
+                .filter(h => h <= height)
+                .sort((a, b) => b - a)[0]
+                ?? Math.min(...product.priceMatrices.map(pm => pm.heightMax));
+
+            // 3️⃣ Get price for that slab combination
             const priceEntry = product.priceMatrices.find(pm =>
-                width >= pm.widthMin &&
-                width <= pm.widthMax &&
-                height >= pm.heightMin &&
-                height <= pm.heightMax
+                pm.widthMax === widthSlab &&
+                pm.heightMax === heightSlab
             );
 
             if (priceEntry) {
                 measurementPrice = priceEntry.price;
                 totalPrice += measurementPrice;
-            } else {
-                // If no exact match, calculate based on area (fallback)
-                const area = (width * height) / 1000000; // mm² to m²
-                const pricePerSqM = 40; // Default price per square meter
-                measurementPrice = area * pricePerSqM;
-                totalPrice += measurementPrice;
             }
         }
+
 
         // ============================================
         // Apply Quantity
