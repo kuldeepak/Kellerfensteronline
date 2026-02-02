@@ -76,59 +76,29 @@ export const action = async ({ request }) => {
         // ============================================
         // Calculate Measurement Price (from price matrix)
         // ============================================
-        // let measurementPrice = 0;
-        // if (measurements && measurements.breite && measurements.hoehe) {
-        //     const width = parseInt(measurements.breite);
-        //     const height = parseInt(measurements.hoehe);
-
-        //     // Find matching price in matrix
-        //     const priceEntry = product.priceMatrices.find(pm =>
-        //         (width + 1) >= pm.widthMin &&
-        //         (width + 1) <= pm.widthMax &&
-        //         (height + 1) >= pm.heightMin &&
-        //         (height + 1) <= pm.heightMax
-        //     );
-
-        //     if (priceEntry) {
-        //         measurementPrice = priceEntry.price;
-        //         totalPrice += measurementPrice;
-        //     } else {
-        //         // If no exact match, calculate based on area (fallback)
-        //         const area = (width * height) / 1000000; // mm² to m²
-        //         const pricePerSqM = 40; // Default price per square meter
-        //         measurementPrice = area * pricePerSqM;
-        //         totalPrice += measurementPrice;
-        //     }
-        // }
-
         let measurementPrice = 0;
+        if (measurements && measurements.breite && measurements.hoehe) {
+            const width = parseInt(measurements.breite);
+            const height = parseInt(measurements.hoehe);
 
-        if (measurements?.breite && measurements?.hoehe) {
-            const width = Math.round(Number(measurements.breite));
-            const height = Math.round(Number(measurements.hoehe));
-
+            // Find matching price in matrix
             const priceEntry = product.priceMatrices.find(pm =>
-                width >= Number(pm.widthMin) &&
-                width <= Number(pm.widthMax) &&
-                height >= Number(pm.heightMin) &&
-                height <= Number(pm.heightMax)
+                (width + 1) >= pm.widthMin &&
+                (width + 1) <= pm.widthMax &&
+                (height + 1) >= pm.heightMin &&
+                (height + 1) <= pm.heightMax
             );
 
-            if (!priceEntry) {
-                return json(
-                    {
-                        success: false,
-                        error: "Price not defined for selected size"
-                    },
-                    {
-                        status: 400,
-                        headers: { "Access-Control-Allow-Origin": "*" }
-                    }
-                );
+            if (priceEntry) {
+                measurementPrice = priceEntry.price;
+                totalPrice += measurementPrice;
+            } else {
+                // If no exact match, calculate based on area (fallback)
+                const area = (width * height) / 1000000; // mm² to m²
+                const pricePerSqM = 0; // Default price per square meter
+                measurementPrice = area * pricePerSqM;
+                totalPrice += measurementPrice;
             }
-
-            measurementPrice = priceEntry.price;
-            totalPrice += measurementPrice;
         }
 
         // ============================================
