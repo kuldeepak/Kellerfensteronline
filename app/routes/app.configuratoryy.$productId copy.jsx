@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useFetcher, useNavigate, useParams, useLoaderData, useRevalidator } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
@@ -209,10 +209,6 @@ export default function ConfigureProduct() {
   const navigate = useNavigate();
   const shopify = useAppBridge();
 
-  // Refs for scrolling
-  const stepFormRef = useRef(null);
-  const optionFormRefs = useRef({});
-
   const [showStepForm, setShowStepForm] = useState(false);
   const [editingStep, setEditingStep] = useState(null);
   const [showOptionForm, setShowOptionForm] = useState(null);
@@ -355,18 +351,9 @@ export default function ConfigureProduct() {
       heightMax: step.heightMax?.toString() || "",
     });
     setShowStepForm(true);
-
-    // Scroll to form after a short delay to ensure it's rendered
-    setTimeout(() => {
-      stepFormRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'nearest'
-      });
-    }, 100);
   };
 
-  const handleEditOption = (option, stepId) => {
+  const handleEditOption = (option) => {
     setEditingOption(option);
     setOptionFormData({
       value: option.value,
@@ -376,15 +363,6 @@ export default function ConfigureProduct() {
       price: option.price.toString(),
       showSteps: option.showSteps || "",
     });
-
-    // Scroll to option form after a short delay
-    setTimeout(() => {
-      optionFormRefs.current[stepId]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
-      });
-    }, 100);
   };
 
   const handleSaveStep = () => {
@@ -494,8 +472,7 @@ export default function ConfigureProduct() {
           <s-button
             variant="primary"
             onClick={() => {
-              const willShow = !showStepForm;
-              setShowStepForm(willShow);
+              setShowStepForm(!showStepForm);
               setEditingStep(null);
               setStepFormData({
                 key: "",
@@ -509,17 +486,6 @@ export default function ConfigureProduct() {
                 heightMin: "",
                 heightMax: "",
               });
-
-              // Scroll to form if opening
-              if (willShow) {
-                setTimeout(() => {
-                  stepFormRef.current?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                    inline: 'nearest'
-                  });
-                }, 100);
-              }
             }}
           >
             {showStepForm ? "✕ Cancel" : "+ Add New Step"}
@@ -529,327 +495,316 @@ export default function ConfigureProduct() {
         <s-stack direction="block" gap="base">
           {/* Step Form */}
           {showStepForm && (
-            <div ref={stepFormRef} style={{ scrollMarginTop: '20px' }}>
-              <s-box
-                padding="loose"
-                borderWidth="base"
-                borderRadius="base"
-                background="surface-subdued"
-                style={{
-                  boxShadow: editingStep ? '0 0 0 3px rgba(0, 128, 96, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                  transition: 'box-shadow 0.3s ease'
-                }}
-              >
-                <s-stack direction="block" gap="base">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <s-heading variant="headingMd">
-                      {editingStep ? "✏️ Edit Step" : "➕ Create New Step"}
-                    </s-heading>
-                    <s-badge tone="info">{editingStep ? "Editing Mode" : "New Step"}</s-badge>
-                  </div>
+            <s-box padding="loose" borderWidth="base" borderRadius="base" background="surface-subdued">
+              <s-stack direction="block" gap="base">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <s-heading variant="headingMd">
+                    {editingStep ? "✏️ Edit Step" : "➕ Create New Step"}
+                  </s-heading>
+                  <s-badge tone="info">{editingStep ? "Editing Mode" : "New Step"}</s-badge>
+                </div>
 
-                  <s-divider />
+                <s-divider />
 
-                  {/* Step Type Selection - Visual Cards */}
-                  <div>
-                    <s-text variant="bodyMd"><strong>Step Type</strong></s-text>
-                    <s-text variant="bodySm" tone="subdued">Choose how customers will interact with this step</s-text>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
-                      <div
-                        onClick={() => setStepFormData({ ...stepFormData, type: "OPTIONS" })}
-                        style={{
-                          padding: '16px',
-                          border: stepFormData.type === "OPTIONS" ? '2px solid #008060' : '2px solid #e1e3e5',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          backgroundColor: stepFormData.type === "OPTIONS" ? '#f6f6f7' : '#fff',
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        <div style={{ fontSize: '24px', marginBottom: '8px' }}>📋</div>
-                        <s-text variant="bodyMd"><strong>Multiple Choice</strong></s-text>
-                        <s-text variant="bodySm" tone="subdued">Let customers select from predefined options</s-text>
-                      </div>
-                      <div
-                        onClick={() => setStepFormData({ ...stepFormData, type: "MEASUREMENT" })}
-                        style={{
-                          padding: '16px',
-                          border: stepFormData.type === "MEASUREMENT" ? '2px solid #008060' : '2px solid #e1e3e5',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          backgroundColor: stepFormData.type === "MEASUREMENT" ? '#f6f6f7' : '#fff',
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        <div style={{ fontSize: '24px', marginBottom: '8px' }}>📏</div>
-                        <s-text variant="bodyMd"><strong>Measurements</strong></s-text>
-                        <s-text variant="bodySm" tone="subdued">Customers enter custom width & height</s-text>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Basic Information */}
-                  <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px' }}>
-                    <s-text variant="bodyMd"><strong>📝 Basic Information</strong></s-text>
-                    <s-stack direction="block" gap="base" style={{ marginTop: '12px' }}>
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>Display Title</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
-                        </label>
-                        <s-text variant="bodySm" tone="subdued">What customers see (e.g., "Window Type", "Choose Color")</s-text>
-                        <input
-                          type="text"
-                          value={stepFormData.title}
-                          onChange={(e) => setStepFormData({ ...stepFormData, title: e.target.value })}
-                          placeholder="e.g., Window Type"
-                          required
-                          style={{
-                            width: '100%',
-                            padding: '10px 12px',
-                            border: '1px solid #c9cccf',
-                            borderRadius: '6px',
-                            marginTop: '6px',
-                            fontSize: '14px'
-                          }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>Internal Key</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
-                        </label>
-                        <s-text variant="bodySm" tone="subdued">Unique identifier (lowercase, no spaces, e.g., "window_type")</s-text>
-                        <input
-                          type="text"
-                          value={stepFormData.key}
-                          onChange={(e) => setStepFormData({ ...stepFormData, key: e.target.value.toLowerCase().replace(/\s/g, '_') })}
-                          placeholder="e.g., window_type"
-                          required
-                          style={{
-                            width: '100%',
-                            padding: '10px 12px',
-                            border: '1px solid #c9cccf',
-                            borderRadius: '6px',
-                            marginTop: '6px',
-                            fontSize: '14px',
-                            fontFamily: 'monospace'
-                          }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>Subtitle</strong> (Optional)</s-text>
-                        </label>
-                        <s-text variant="bodySm" tone="subdued">Step progress indicator (e.g., "Step 1 of 3")</s-text>
-                        <input
-                          type="text"
-                          value={stepFormData.subtitle}
-                          onChange={(e) => setStepFormData({ ...stepFormData, subtitle: e.target.value })}
-                          placeholder="e.g., Step 1 of 3"
-                          style={{
-                            width: '100%',
-                            padding: '10px 12px',
-                            border: '1px solid #c9cccf',
-                            borderRadius: '6px',
-                            marginTop: '6px',
-                            fontSize: '14px'
-                          }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>Description</strong> (Optional)</s-text>
-                        </label>
-                        <s-text variant="bodySm" tone="subdued">Additional help text for customers</s-text>
-                        <textarea
-                          value={stepFormData.description}
-                          onChange={(e) => setStepFormData({ ...stepFormData, description: e.target.value })}
-                          placeholder="e.g., Select the type of window you need..."
-                          rows="3"
-                          style={{
-                            width: '100%',
-                            padding: '10px 12px',
-                            border: '1px solid #c9cccf',
-                            borderRadius: '6px',
-                            marginTop: '6px',
-                            fontSize: '14px',
-                            resize: 'vertical'
-                          }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>🖼️ Step Image</strong> (Optional)</s-text>
-                        </label>
-                        <s-text variant="bodySm" tone="subdued">Upload an image to display at the top of this step</s-text>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleStepImageUpload}
-                          disabled={uploadingStepImage}
-                          style={{
-                            width: '100%',
-                            padding: '10px 12px',
-                            border: '2px dashed #c9cccf',
-                            borderRadius: '6px',
-                            marginTop: '6px',
-                            backgroundColor: '#fff',
-                            cursor: 'pointer'
-                          }}
-                        />
-                        {uploadingStepImage && (
-                          <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <s-spinner size="small" />
-                            <s-text variant="bodySm">Uploading image...</s-text>
-                          </div>
-                        )}
-                        {stepFormData.image && (
-                          <div style={{ marginTop: '12px', position: 'relative', display: 'inline-block' }}>
-                            <img
-                              src={stepFormData.image}
-                              alt="Preview"
-                              style={{
-                                maxWidth: '250px',
-                                maxHeight: '200px',
-                                borderRadius: '6px',
-                                border: '1px solid #e1e3e5'
-                              }}
-                            />
-                            <button
-                              onClick={() => setStepFormData({ ...stepFormData, image: "" })}
-                              style={{
-                                position: 'absolute',
-                                top: '8px',
-                                right: '8px',
-                                background: 'rgba(0,0,0,0.7)',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '24px',
-                                height: '24px',
-                                cursor: 'pointer',
-                                fontSize: '14px'
-                              }}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </s-stack>
-                  </div>
-
-                  {/* Measurement Ranges (only for MEASUREMENT type) */}
-                  {stepFormData.type === "MEASUREMENT" && (
-                    <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px' }}>
-                      <s-text variant="bodyMd"><strong>📏 Measurement Ranges (in millimeters)</strong></s-text>
-                      <s-text variant="bodySm" tone="subdued">Set minimum and maximum values customers can enter</s-text>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '4px' }}>
-                            <s-text variant="bodySm"><strong>Width - Minimum (mm)</strong></s-text>
-                          </label>
-                          <input
-                            type="number"
-                            value={stepFormData.widthMin}
-                            onChange={(e) => setStepFormData({ ...stepFormData, widthMin: e.target.value })}
-                            placeholder="e.g., 300"
-                            style={{
-                              width: '100%',
-                              padding: '10px 12px',
-                              border: '1px solid #c9cccf',
-                              borderRadius: '6px',
-                              fontSize: '14px'
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '4px' }}>
-                            <s-text variant="bodySm"><strong>Width - Maximum (mm)</strong></s-text>
-                          </label>
-                          <input
-                            type="number"
-                            value={stepFormData.widthMax}
-                            onChange={(e) => setStepFormData({ ...stepFormData, widthMax: e.target.value })}
-                            placeholder="e.g., 2000"
-                            style={{
-                              width: '100%',
-                              padding: '10px 12px',
-                              border: '1px solid #c9cccf',
-                              borderRadius: '6px',
-                              fontSize: '14px'
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '4px' }}>
-                            <s-text variant="bodySm"><strong>Height - Minimum (mm)</strong></s-text>
-                          </label>
-                          <input
-                            type="number"
-                            value={stepFormData.heightMin}
-                            onChange={(e) => setStepFormData({ ...stepFormData, heightMin: e.target.value })}
-                            placeholder="e.g., 400"
-                            style={{
-                              width: '100%',
-                              padding: '10px 12px',
-                              border: '1px solid #c9cccf',
-                              borderRadius: '6px',
-                              fontSize: '14px'
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '4px' }}>
-                            <s-text variant="bodySm"><strong>Height - Maximum (mm)</strong></s-text>
-                          </label>
-                          <input
-                            type="number"
-                            value={stepFormData.heightMax}
-                            onChange={(e) => setStepFormData({ ...stepFormData, heightMax: e.target.value })}
-                            placeholder="e.g., 2000"
-                            style={{
-                              width: '100%',
-                              padding: '10px 12px',
-                              border: '1px solid #c9cccf',
-                              borderRadius: '6px',
-                              fontSize: '14px'
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <s-divider />
-
-                  {/* Action Buttons */}
-                  <s-stack direction="inline" gap="base">
-                    <s-button
-                      variant="primary"
-                      onClick={handleSaveStep}
-                      {...(isLoading ? { loading: true } : {})}
-                      disabled={!stepFormData.key || !stepFormData.title}
-                    >
-                      {editingStep ? "💾 Update Step" : "✓ Create Step"}
-                    </s-button>
-                    <s-button
-                      variant="tertiary"
-                      onClick={() => {
-                        setShowStepForm(false);
-                        setEditingStep(null);
+                {/* Step Type Selection - Visual Cards */}
+                <div>
+                  <s-text variant="bodyMd"><strong>Step Type</strong></s-text>
+                  <s-text variant="bodySm" tone="subdued">Choose how customers will interact with this step</s-text>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
+                    <div
+                      onClick={() => setStepFormData({ ...stepFormData, type: "OPTIONS" })}
+                      style={{
+                        padding: '16px',
+                        border: stepFormData.type === "OPTIONS" ? '2px solid #008060' : '2px solid #e1e3e5',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        backgroundColor: stepFormData.type === "OPTIONS" ? '#f6f6f7' : '#fff',
+                        transition: 'all 0.2s'
                       }}
                     >
-                      Cancel
-                    </s-button>
+                      <div style={{ fontSize: '24px', marginBottom: '8px' }}>📋</div>
+                      <s-text variant="bodyMd"><strong>Multiple Choice</strong></s-text>
+                      <s-text variant="bodySm" tone="subdued">Let customers select from predefined options</s-text>
+                    </div>
+                    <div
+                      onClick={() => setStepFormData({ ...stepFormData, type: "MEASUREMENT" })}
+                      style={{
+                        padding: '16px',
+                        border: stepFormData.type === "MEASUREMENT" ? '2px solid #008060' : '2px solid #e1e3e5',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        backgroundColor: stepFormData.type === "MEASUREMENT" ? '#f6f6f7' : '#fff',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div style={{ fontSize: '24px', marginBottom: '8px' }}>📏</div>
+                      <s-text variant="bodyMd"><strong>Measurements</strong></s-text>
+                      <s-text variant="bodySm" tone="subdued">Customers enter custom width & height</s-text>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Basic Information */}
+                <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px' }}>
+                  <s-text variant="bodyMd"><strong>📝 Basic Information</strong></s-text>
+                  <s-stack direction="block" gap="base" style={{ marginTop: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px' }}>
+                        <s-text variant="bodySm"><strong>Display Title</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
+                      </label>
+                      <s-text variant="bodySm" tone="subdued">What customers see (e.g., "Window Type", "Choose Color")</s-text>
+                      <input
+                        type="text"
+                        value={stepFormData.title}
+                        onChange={(e) => setStepFormData({ ...stepFormData, title: e.target.value })}
+                        placeholder="e.g., Window Type"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #c9cccf',
+                          borderRadius: '6px',
+                          marginTop: '6px',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px' }}>
+                        <s-text variant="bodySm"><strong>Internal Key</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
+                      </label>
+                      <s-text variant="bodySm" tone="subdued">Unique identifier (lowercase, no spaces, e.g., "window_type")</s-text>
+                      <input
+                        type="text"
+                        value={stepFormData.key}
+                        onChange={(e) => setStepFormData({ ...stepFormData, key: e.target.value.toLowerCase().replace(/\s/g, '_') })}
+                        placeholder="e.g., window_type"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #c9cccf',
+                          borderRadius: '6px',
+                          marginTop: '6px',
+                          fontSize: '14px',
+                          fontFamily: 'monospace'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px' }}>
+                        <s-text variant="bodySm"><strong>Subtitle</strong> (Optional)</s-text>
+                      </label>
+                      <s-text variant="bodySm" tone="subdued">Step progress indicator (e.g., "Step 1 of 3")</s-text>
+                      <input
+                        type="text"
+                        value={stepFormData.subtitle}
+                        onChange={(e) => setStepFormData({ ...stepFormData, subtitle: e.target.value })}
+                        placeholder="e.g., Step 1 of 3"
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #c9cccf',
+                          borderRadius: '6px',
+                          marginTop: '6px',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px' }}>
+                        <s-text variant="bodySm"><strong>Description</strong> (Optional)</s-text>
+                      </label>
+                      <s-text variant="bodySm" tone="subdued">Additional help text for customers</s-text>
+                      <textarea
+                        value={stepFormData.description}
+                        onChange={(e) => setStepFormData({ ...stepFormData, description: e.target.value })}
+                        placeholder="e.g., Select the type of window you need..."
+                        rows="3"
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #c9cccf',
+                          borderRadius: '6px',
+                          marginTop: '6px',
+                          fontSize: '14px',
+                          resize: 'vertical'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '4px' }}>
+                        <s-text variant="bodySm"><strong>🖼️ Step Image</strong> (Optional)</s-text>
+                      </label>
+                      <s-text variant="bodySm" tone="subdued">Upload an image to display at the top of this step</s-text>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleStepImageUpload}
+                        disabled={uploadingStepImage}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '2px dashed #c9cccf',
+                          borderRadius: '6px',
+                          marginTop: '6px',
+                          backgroundColor: '#fff',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      {uploadingStepImage && (
+                        <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <s-spinner size="small" />
+                          <s-text variant="bodySm">Uploading image...</s-text>
+                        </div>
+                      )}
+                      {stepFormData.image && (
+                        <div style={{ marginTop: '12px', position: 'relative', display: 'inline-block' }}>
+                          <img
+                            src={stepFormData.image}
+                            alt="Preview"
+                            style={{
+                              maxWidth: '250px',
+                              maxHeight: '200px',
+                              borderRadius: '6px',
+                              border: '1px solid #e1e3e5'
+                            }}
+                          />
+                          <button
+                            onClick={() => setStepFormData({ ...stepFormData, image: "" })}
+                            style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              background: 'rgba(0,0,0,0.7)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '24px',
+                              height: '24px',
+                              cursor: 'pointer',
+                              fontSize: '14px'
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </s-stack>
+                </div>
+
+                {/* Measurement Ranges (only for MEASUREMENT type) */}
+                {stepFormData.type === "MEASUREMENT" && (
+                  <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px' }}>
+                    <s-text variant="bodyMd"><strong>📏 Measurement Ranges (in millimeters)</strong></s-text>
+                    <s-text variant="bodySm" tone="subdued">Set minimum and maximum values customers can enter</s-text>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '4px' }}>
+                          <s-text variant="bodySm"><strong>Width - Minimum (mm)</strong></s-text>
+                        </label>
+                        <input
+                          type="number"
+                          value={stepFormData.widthMin}
+                          onChange={(e) => setStepFormData({ ...stepFormData, widthMin: e.target.value })}
+                          placeholder="e.g., 300"
+                          style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            border: '1px solid #c9cccf',
+                            borderRadius: '6px',
+                            fontSize: '14px'
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '4px' }}>
+                          <s-text variant="bodySm"><strong>Width - Maximum (mm)</strong></s-text>
+                        </label>
+                        <input
+                          type="number"
+                          value={stepFormData.widthMax}
+                          onChange={(e) => setStepFormData({ ...stepFormData, widthMax: e.target.value })}
+                          placeholder="e.g., 2000"
+                          style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            border: '1px solid #c9cccf',
+                            borderRadius: '6px',
+                            fontSize: '14px'
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '4px' }}>
+                          <s-text variant="bodySm"><strong>Height - Minimum (mm)</strong></s-text>
+                        </label>
+                        <input
+                          type="number"
+                          value={stepFormData.heightMin}
+                          onChange={(e) => setStepFormData({ ...stepFormData, heightMin: e.target.value })}
+                          placeholder="e.g., 400"
+                          style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            border: '1px solid #c9cccf',
+                            borderRadius: '6px',
+                            fontSize: '14px'
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '4px' }}>
+                          <s-text variant="bodySm"><strong>Height - Maximum (mm)</strong></s-text>
+                        </label>
+                        <input
+                          type="number"
+                          value={stepFormData.heightMax}
+                          onChange={(e) => setStepFormData({ ...stepFormData, heightMax: e.target.value })}
+                          placeholder="e.g., 2000"
+                          style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            border: '1px solid #c9cccf',
+                            borderRadius: '6px',
+                            fontSize: '14px'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <s-divider />
+
+                {/* Action Buttons */}
+                <s-stack direction="inline" gap="base">
+                  <s-button
+                    variant="primary"
+                    onClick={handleSaveStep}
+                    {...(isLoading ? { loading: true } : {})}
+                    disabled={!stepFormData.key || !stepFormData.title}
+                  >
+                    {editingStep ? "💾 Update Step" : "✓ Create Step"}
+                  </s-button>
+                  <s-button
+                    variant="tertiary"
+                    onClick={() => {
+                      setShowStepForm(false);
+                      setEditingStep(null);
+                    }}
+                  >
+                    Cancel
+                  </s-button>
                 </s-stack>
-              </s-box>
-            </div>
+              </s-stack>
+            </s-box>
           )}
 
           {/* Existing Steps List */}
@@ -973,15 +928,6 @@ export default function ConfigureProduct() {
                                 price: "0",
                                 showSteps: "",
                               });
-
-                              // Scroll to option form
-                              setTimeout(() => {
-                                optionFormRefs.current[step.id]?.scrollIntoView({
-                                  behavior: 'smooth',
-                                  block: 'center',
-                                  inline: 'nearest'
-                                });
-                              }, 100);
                             }}
                           >
                             + Add Choice
@@ -1068,7 +1014,7 @@ export default function ConfigureProduct() {
                                       size="slim"
                                       onClick={() => {
                                         setShowOptionForm(step.id);
-                                        handleEditOption(option, step.id);
+                                        handleEditOption(option);
                                       }}
                                     >
                                       Edit
@@ -1090,236 +1036,225 @@ export default function ConfigureProduct() {
 
                         {/* Option Form */}
                         {showOptionForm === step.id && (
-                          <div ref={(el) => optionFormRefs.current[step.id] = el} style={{ scrollMarginTop: '20px' }}>
-                            <s-box
-                              padding="base"
-                              background="surface-subdued"
-                              borderRadius="base"
-                              style={{
-                                marginTop: '16px',
-                                boxShadow: editingOption ? '0 0 0 3px rgba(0, 128, 96, 0.3)' : 'none',
-                                transition: 'box-shadow 0.3s ease'
-                              }}
-                            >
-                              <s-stack direction="block" gap="base">
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <s-heading variant="headingSm">
-                                    {editingOption ? "✏️ Edit Choice" : "➕ Add New Choice"}
-                                  </s-heading>
-                                  <s-badge tone={editingOption ? "warning" : "info"}>
-                                    {editingOption ? "Editing" : "New"}
-                                  </s-badge>
-                                </div>
+                          <s-box padding="base" background="surface-subdued" borderRadius="base" style={{ marginTop: '16px' }}>
+                            <s-stack direction="block" gap="base">
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <s-heading variant="headingSm">
+                                  {editingOption ? "✏️ Edit Choice" : "➕ Add New Choice"}
+                                </s-heading>
+                                <s-badge tone={editingOption ? "warning" : "info"}>
+                                  {editingOption ? "Editing" : "New"}
+                                </s-badge>
+                              </div>
 
-                                <s-divider />
+                              <s-divider />
 
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>Choice Name</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
-                                  </label>
-                                  <s-text variant="bodySm" tone="subdued">What customers will see (e.g., "Standard Window")</s-text>
+                              <div>
+                                <label style={{ display: 'block', marginBottom: '4px' }}>
+                                  <s-text variant="bodySm"><strong>Choice Name</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
+                                </label>
+                                <s-text variant="bodySm" tone="subdued">What customers will see (e.g., "Standard Window")</s-text>
+                                <input
+                                  type="text"
+                                  value={optionFormData.label}
+                                  onChange={(e) => setOptionFormData({ ...optionFormData, label: e.target.value })}
+                                  placeholder="e.g., Standard Window"
+                                  required
+                                  style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '1px solid #c9cccf',
+                                    borderRadius: '6px',
+                                    marginTop: '6px',
+                                    fontSize: '14px'
+                                  }}
+                                />
+                              </div>
+
+                              <div>
+                                <label style={{ display: 'block', marginBottom: '4px' }}>
+                                  <s-text variant="bodySm"><strong>Internal Value</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
+                                </label>
+                                <s-text variant="bodySm" tone="subdued">Unique code for this choice (lowercase, no spaces)</s-text>
+                                <input
+                                  type="text"
+                                  value={optionFormData.value}
+                                  onChange={(e) => setOptionFormData({ ...optionFormData, value: e.target.value.toLowerCase().replace(/\s/g, '_') })}
+                                  placeholder="e.g., standard_window"
+                                  required
+                                  style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '1px solid #c9cccf',
+                                    borderRadius: '6px',
+                                    marginTop: '6px',
+                                    fontSize: '14px',
+                                    fontFamily: 'monospace'
+                                  }}
+                                />
+                              </div>
+
+                              <div>
+                                <label style={{ display: 'block', marginBottom: '4px' }}>
+                                  <s-text variant="bodySm"><strong>Description</strong> (Optional)</s-text>
+                                </label>
+                                <s-text variant="bodySm" tone="subdued">Additional details to help customers decide</s-text>
+                                <input
+                                  type="text"
+                                  value={optionFormData.description}
+                                  onChange={(e) => setOptionFormData({ ...optionFormData, description: e.target.value })}
+                                  placeholder="e.g., Perfect for rectangular windows"
+                                  style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '1px solid #c9cccf',
+                                    borderRadius: '6px',
+                                    marginTop: '6px',
+                                    fontSize: '14px'
+                                  }}
+                                />
+                              </div>
+
+                              <div>
+                                <label style={{ display: 'block', marginBottom: '4px' }}>
+                                  <s-text variant="bodySm"><strong>💰 Additional Price</strong></s-text>
+                                </label>
+                                <s-text variant="bodySm" tone="subdued">Extra cost for this choice (leave 0 for no additional charge)</s-text>
+                                <div style={{ position: 'relative', marginTop: '6px' }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    left: '12px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    fontSize: '14px',
+                                    color: '#6b7280'
+                                  }}>€</span>
                                   <input
-                                    type="text"
-                                    value={optionFormData.label}
-                                    onChange={(e) => setOptionFormData({ ...optionFormData, label: e.target.value })}
-                                    placeholder="e.g., Standard Window"
-                                    required
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={optionFormData.price}
+                                    onChange={(e) => setOptionFormData({ ...optionFormData, price: e.target.value })}
+                                    placeholder="0.00"
                                     style={{
                                       width: '100%',
-                                      padding: '10px 12px',
+                                      padding: '10px 12px 10px 28px',
                                       border: '1px solid #c9cccf',
                                       borderRadius: '6px',
-                                      marginTop: '6px',
                                       fontSize: '14px'
                                     }}
                                   />
                                 </div>
+                              </div>
 
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>Internal Value</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
-                                  </label>
-                                  <s-text variant="bodySm" tone="subdued">Unique code for this choice (lowercase, no spaces)</s-text>
-                                  <input
-                                    type="text"
-                                    value={optionFormData.value}
-                                    onChange={(e) => setOptionFormData({ ...optionFormData, value: e.target.value.toLowerCase().replace(/\s/g, '_') })}
-                                    placeholder="e.g., standard_window"
-                                    required
-                                    style={{
-                                      width: '100%',
-                                      padding: '10px 12px',
-                                      border: '1px solid #c9cccf',
-                                      borderRadius: '6px',
-                                      marginTop: '6px',
-                                      fontSize: '14px',
-                                      fontFamily: 'monospace'
-                                    }}
-                                  />
-                                </div>
-
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>Description</strong> (Optional)</s-text>
-                                  </label>
-                                  <s-text variant="bodySm" tone="subdued">Additional details to help customers decide</s-text>
-                                  <input
-                                    type="text"
-                                    value={optionFormData.description}
-                                    onChange={(e) => setOptionFormData({ ...optionFormData, description: e.target.value })}
-                                    placeholder="e.g., Perfect for rectangular windows"
-                                    style={{
-                                      width: '100%',
-                                      padding: '10px 12px',
-                                      border: '1px solid #c9cccf',
-                                      borderRadius: '6px',
-                                      marginTop: '6px',
-                                      fontSize: '14px'
-                                    }}
-                                  />
-                                </div>
-
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>💰 Additional Price</strong></s-text>
-                                  </label>
-                                  <s-text variant="bodySm" tone="subdued">Extra cost for this choice (leave 0 for no additional charge)</s-text>
-                                  <div style={{ position: 'relative', marginTop: '6px' }}>
-                                    <span style={{
-                                      position: 'absolute',
-                                      left: '12px',
-                                      top: '50%',
-                                      transform: 'translateY(-50%)',
-                                      fontSize: '14px',
-                                      color: '#6b7280'
-                                    }}>€</span>
-                                    <input
-                                      type="number"
-                                      step="0.01"
-                                      min="0"
-                                      value={optionFormData.price}
-                                      onChange={(e) => setOptionFormData({ ...optionFormData, price: e.target.value })}
-                                      placeholder="0.00"
+                              <div>
+                                <label style={{ display: 'block', marginBottom: '4px' }}>
+                                  <s-text variant="bodySm"><strong>🖼️ Choice Image</strong> (Optional)</s-text>
+                                </label>
+                                <s-text variant="bodySm" tone="subdued">Visual representation of this choice</s-text>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleOptionImageUpload}
+                                  disabled={uploadingOptionImage}
+                                  style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '2px dashed #c9cccf',
+                                    borderRadius: '6px',
+                                    marginTop: '6px',
+                                    backgroundColor: '#fff',
+                                    cursor: 'pointer'
+                                  }}
+                                />
+                                {uploadingOptionImage && (
+                                  <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <s-spinner size="small" />
+                                    <s-text variant="bodySm">Uploading image...</s-text>
+                                  </div>
+                                )}
+                                {optionFormData.image && (
+                                  <div style={{ marginTop: '12px', position: 'relative', display: 'inline-block' }}>
+                                    <img
+                                      src={optionFormData.image}
+                                      alt="Preview"
                                       style={{
-                                        width: '100%',
-                                        padding: '10px 12px 10px 28px',
-                                        border: '1px solid #c9cccf',
+                                        maxWidth: '200px',
+                                        maxHeight: '150px',
                                         borderRadius: '6px',
-                                        fontSize: '14px'
+                                        border: '1px solid #e1e3e5'
                                       }}
                                     />
+                                    <button
+                                      onClick={() => setOptionFormData({ ...optionFormData, image: "" })}
+                                      style={{
+                                        position: 'absolute',
+                                        top: '8px',
+                                        right: '8px',
+                                        background: 'rgba(0,0,0,0.7)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        width: '24px',
+                                        height: '24px',
+                                        cursor: 'pointer',
+                                        fontSize: '14px'
+                                      }}
+                                    >
+                                      ✕
+                                    </button>
                                   </div>
-                                </div>
+                                )}
+                              </div>
 
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>🖼️ Choice Image</strong> (Optional)</s-text>
-                                  </label>
-                                  <s-text variant="bodySm" tone="subdued">Visual representation of this choice</s-text>
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleOptionImageUpload}
-                                    disabled={uploadingOptionImage}
-                                    style={{
-                                      width: '100%',
-                                      padding: '10px 12px',
-                                      border: '2px dashed #c9cccf',
-                                      borderRadius: '6px',
-                                      marginTop: '6px',
-                                      backgroundColor: '#fff',
-                                      cursor: 'pointer'
-                                    }}
-                                  />
-                                  {uploadingOptionImage && (
-                                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                      <s-spinner size="small" />
-                                      <s-text variant="bodySm">Uploading image...</s-text>
-                                    </div>
-                                  )}
-                                  {optionFormData.image && (
-                                    <div style={{ marginTop: '12px', position: 'relative', display: 'inline-block' }}>
-                                      <img
-                                        src={optionFormData.image}
-                                        alt="Preview"
-                                        style={{
-                                          maxWidth: '200px',
-                                          maxHeight: '150px',
-                                          borderRadius: '6px',
-                                          border: '1px solid #e1e3e5'
-                                        }}
-                                      />
-                                      <button
-                                        onClick={() => setOptionFormData({ ...optionFormData, image: "" })}
-                                        style={{
-                                          position: 'absolute',
-                                          top: '8px',
-                                          right: '8px',
-                                          background: 'rgba(0,0,0,0.7)',
-                                          color: 'white',
-                                          border: 'none',
-                                          borderRadius: '50%',
-                                          width: '24px',
-                                          height: '24px',
-                                          cursor: 'pointer',
-                                          fontSize: '14px'
-                                        }}
-                                      >
-                                        ✕
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
+                              <div>
+                                <label style={{ display: 'block', marginBottom: '4px' }}>
+                                  <s-text variant="bodySm"><strong>🔀 Conditional Flow</strong> (Advanced)</s-text>
+                                </label>
+                                <s-text variant="bodySm" tone="subdued">Show specific next steps when this choice is selected</s-text>
+                                <s-text variant="bodySm" tone="subdued" style={{ display: 'block', marginTop: '4px', fontStyle: 'italic' }}>
+                                  Format: ["step_key_1", "step_key_2"] or leave empty to show all steps
+                                </s-text>
+                                <input
+                                  type="text"
+                                  value={optionFormData.showSteps}
+                                  onChange={(e) => setOptionFormData({ ...optionFormData, showSteps: e.target.value })}
+                                  placeholder='e.g., ["color_selection", "measurements"]'
+                                  style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '1px solid #c9cccf',
+                                    borderRadius: '6px',
+                                    marginTop: '6px',
+                                    fontSize: '14px',
+                                    fontFamily: 'monospace'
+                                  }}
+                                />
+                              </div>
 
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>🔀 Conditional Flow</strong> (Advanced)</s-text>
-                                  </label>
-                                  <s-text variant="bodySm" tone="subdued">Show specific next steps when this choice is selected</s-text>
-                                  <s-text variant="bodySm" tone="subdued" style={{ display: 'block', marginTop: '4px', fontStyle: 'italic' }}>
-                                    Format: ["step_key_1", "step_key_2"] or leave empty to show all steps
-                                  </s-text>
-                                  <input
-                                    type="text"
-                                    value={optionFormData.showSteps}
-                                    onChange={(e) => setOptionFormData({ ...optionFormData, showSteps: e.target.value })}
-                                    placeholder='e.g., ["color_selection", "measurements"]'
-                                    style={{
-                                      width: '100%',
-                                      padding: '10px 12px',
-                                      border: '1px solid #c9cccf',
-                                      borderRadius: '6px',
-                                      marginTop: '6px',
-                                      fontSize: '14px',
-                                      fontFamily: 'monospace'
-                                    }}
-                                  />
-                                </div>
+                              <s-divider />
 
-                                <s-divider />
-
-                                <s-stack direction="inline" gap="base">
-                                  <s-button
-                                    variant="primary"
-                                    onClick={() => handleSaveOption(step.id)}
-                                    {...(isLoading ? { loading: true } : {})}
-                                    disabled={!optionFormData.value || !optionFormData.label}
-                                  >
-                                    {editingOption ? "💾 Update Choice" : "✓ Save Choice"}
-                                  </s-button>
-                                  <s-button
-                                    variant="tertiary"
-                                    onClick={() => {
-                                      setShowOptionForm(null);
-                                      setEditingOption(null);
-                                    }}
-                                  >
-                                    Cancel
-                                  </s-button>
-                                </s-stack>
+                              <s-stack direction="inline" gap="base">
+                                <s-button
+                                  variant="primary"
+                                  onClick={() => handleSaveOption(step.id)}
+                                  {...(isLoading ? { loading: true } : {})}
+                                  disabled={!optionFormData.value || !optionFormData.label}
+                                >
+                                  {editingOption ? "💾 Update Choice" : "✓ Save Choice"}
+                                </s-button>
+                                <s-button
+                                  variant="tertiary"
+                                  onClick={() => {
+                                    setShowOptionForm(null);
+                                    setEditingOption(null);
+                                  }}
+                                >
+                                  Cancel
+                                </s-button>
                               </s-stack>
-                            </s-box>
-                          </div>
+                            </s-stack>
+                          </s-box>
                         )}
                       </div>
                     </>
