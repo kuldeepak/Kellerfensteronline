@@ -102,6 +102,12 @@ export default function PricingMatrix() {
 
   const isLoading = ["loading", "submitting"].includes(fetcher.state);
 
+
+  const [editingWidth, setEditingWidth] = useState(null);
+  const [editingHeight, setEditingHeight] = useState(null);
+  const [tempWidthValue, setTempWidthValue] = useState("");
+  const [tempHeightValue, setTempHeightValue] = useState("");
+
   // Initialize pivot table from existing data
   useEffect(() => {
     if (product?.priceMatrices?.length > 0) {
@@ -352,8 +358,22 @@ export default function PricingMatrix() {
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
                         <input
                           type="number"
-                          value={height}
-                          onChange={(e) => updateHeightRange(height, e.target.value)}
+                          value={editingHeight === height ? tempHeightValue : height}
+                          onFocus={(e) => {
+                            setEditingHeight(height);
+                            setTempHeightValue(height.toString());
+                          }}
+                          onChange={(e) => {
+                            setTempHeightValue(e.target.value);
+                          }}
+                          onBlur={(e) => {
+                            const newValue = parseInt(e.target.value);
+                            if (!isNaN(newValue) && newValue > 0) {
+                              updateHeightRange(height, newValue);
+                            }
+                            setEditingHeight(null);
+                            setTempHeightValue("");
+                          }}
                           style={{
                             width: "70px",
                             padding: "4px",
@@ -423,8 +443,22 @@ export default function PricingMatrix() {
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <input
                           type="number"
-                          value={width}
-                          onChange={(e) => updateWidthRange(width, e.target.value)}
+                          value={editingWidth === width ? tempWidthValue : width}
+                          onFocus={(e) => {
+                            setEditingWidth(width);
+                            setTempWidthValue(width.toString());
+                          }}
+                          onChange={(e) => {
+                            setTempWidthValue(e.target.value);
+                          }}
+                          onBlur={(e) => {
+                            const newValue = parseInt(e.target.value);
+                            if (!isNaN(newValue) && newValue > 0) {
+                              updateWidthRange(width, newValue);
+                            }
+                            setEditingWidth(null);
+                            setTempWidthValue("");
+                          }}
                           style={{
                             width: "70px",
                             padding: "4px",
