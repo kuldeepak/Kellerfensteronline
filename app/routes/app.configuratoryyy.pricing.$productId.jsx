@@ -229,8 +229,9 @@ export default function PricingMatrix() {
     const newValue = parseInt(newWidth);
     if (isNaN(newValue) || newValue <= 0) return;
 
+    // Remove the sort here - just update in place
     const newWidthRanges = widthRanges.map(w => w === oldWidth ? newValue : w);
-    setWidthRanges(newWidthRanges.sort((a, b) => a - b));
+    setWidthRanges(newWidthRanges); // Don't sort during typing
 
     // Update pivot table keys
     const newPivotTable = {};
@@ -246,8 +247,9 @@ export default function PricingMatrix() {
     const newValue = parseInt(newHeight);
     if (isNaN(newValue) || newValue <= 0) return;
 
+    // Remove the sort here - just update in place
     const newHeightRanges = heightRanges.map(h => h === oldHeight ? newValue : h);
-    setHeightRanges(newHeightRanges.sort((a, b) => a - b));
+    setHeightRanges(newHeightRanges); // Don't sort during typing
 
     // Update pivot table keys
     const newPivotTable = {};
