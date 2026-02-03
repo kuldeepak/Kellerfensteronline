@@ -4,9 +4,10 @@ import { useAppBridge } from "@shopify/app-bridge-react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { json } from "@remix-run/node";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
+import prisma from "../db.server";
 
 export const loader = async ({ request }) => {
   await authenticate.admin(request);

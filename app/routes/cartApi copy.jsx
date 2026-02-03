@@ -1,9 +1,10 @@
 import { json } from "@remix-run/node";
 import { PrismaClient } from "@prisma/client";
 import { createAdminApiClient } from "@shopify/admin-api-client";
-import { authenticate } from "../shopify.server";
+// import { authenticate } from "../shopify.server";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
+import prisma from "../db.server";
 
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",

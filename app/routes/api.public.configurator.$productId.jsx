@@ -1,7 +1,8 @@
 import { json } from "@remix-run/node";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
+import prisma from "../db.server";
 
 export const loader = async ({ params }) => {
     console.log(params);

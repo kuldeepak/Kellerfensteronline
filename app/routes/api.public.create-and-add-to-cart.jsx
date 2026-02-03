@@ -1,8 +1,9 @@
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
+import prisma from "../db.server";
 
 export const action = async ({ request }) => {
     const { admin, session } = await authenticate.public.appProxy(request);
