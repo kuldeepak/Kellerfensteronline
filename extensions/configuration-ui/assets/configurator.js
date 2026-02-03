@@ -11,7 +11,10 @@ let PRODUCT_ID = null; // Shopify Product ID
 
 async function loadConfiguration(productId) {
     try {
-        const response = await fetch(`https://plixxo-app-tvhmp.ondigitalocean.app/api/public/configurator/${productId}`);
+        const response = await fetch(`https://plixxo-app-tvhmp.ondigitalocean.app/api/public/configurator/${productId}?v=${Date.now()}`,
+            {
+                cache: 'no-store', // 🚫 disable cache
+            });
         const data = await response.json();
 
         if (!data.success) {
@@ -30,8 +33,9 @@ async function loadConfiguration(productId) {
 
 async function calculatePrice(productId, selections, measurements, quantity) {
     try {
-        const response = await fetch(`https://plixxo-app-tvhmp.ondigitalocean.app/api/public/calculate-price`, {
+        const response = await fetch(`https://plixxo-app-tvhmp.ondigitalocean.app/api/public/calculate-price?v=${Date.now()}`, {
             method: 'POST',
+            cache: 'no-store', // 🚫 disable cache
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -194,8 +198,29 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Method 3: From URL or data attribute
     if (!PRODUCT_ID) {
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get("product_id");
+        const img = params.get("img");
+        const color = params.get("color");
+
+        if (color) {
+            document.querySelector('.custom-alert .color').textContent = color;
+        }
+
+        if (img) {
+            const img_param_url = decodeURIComponent(img);
+
+            const zoomThumb = document.querySelector('.zoom-thumb');
+            const zoomPreview = document.querySelector('.zoom-preview');
+
+            if (zoomThumb && zoomPreview) {
+                zoomThumb.setAttribute('data-url', img_param_url);
+                zoomThumb.style.backgroundImage = `url("${img_param_url}")`;
+                zoomPreview.style.backgroundImage = `url("${img_param_url}")`;
+            }
+        }
         const configuratorEl = document.getElementById('configuratorSteps');
-        PRODUCT_ID = configuratorEl?.dataset?.productId;
+        PRODUCT_ID = productId || configuratorEl?.dataset?.productId;
     }
 
     if (!PRODUCT_ID) {
@@ -216,6 +241,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     console.log('Configuration loaded:', PRODUCT_CONFIG);
+
+    if (PRODUCT_CONFIG) {
+        document.querySelector('.pro_name').textContent =
+            PRODUCT_CONFIG.product.name;
+
+        document.querySelector('.steps_name').textContent =
+            PRODUCT_CONFIG.steps.slice(0, 2).map(s => s.title).join(', ');
+    }
+
 
     let activeFlow = []; // Current visible steps sequence
     let currentStepIndex = 0;
