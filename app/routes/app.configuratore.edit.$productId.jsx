@@ -87,11 +87,11 @@ export default function EditProduct() {
 
   if (!product) {
     return (
-      <s-page heading="Product Not Found">
+      <s-page heading="Produkt nicht gefunden">
         <s-section>
-          <s-paragraph>Product not found.</s-paragraph>
+          <s-paragraph>Produkt nicht gefunden.</s-paragraph>
           <s-button onClick={() => navigate("/app/configurator")}>
-            Back to List
+            Zurück zur Liste
           </s-button>
         </s-section>
       </s-page>
@@ -99,18 +99,18 @@ export default function EditProduct() {
   }
 
   return (
-    <s-page heading="Edit Product Configuration">
+    <s-page heading="Produkt bearbeiten">
       <s-button
         slot="secondary-action"
         onClick={() => navigate("/app/configurator")}
       >
-        Back to List
+        Zurück zur Liste
       </s-button>
 
-      <s-section heading="Product Details">
+      <s-section heading="Produktdetails">
         <s-stack direction="block" gap="base">
           <s-stack direction="block" gap="tight">
-            <s-text variant="headingSm">Shopify Product ID</s-text>
+            <s-text variant="headingSm">Shopify Produkt ID</s-text>
             <input
               type="text"
               value={formData.shopifyProductId}
@@ -127,12 +127,12 @@ export default function EditProduct() {
               }}
             />
             <s-text variant="bodySm" tone="subdued">
-              The Shopify product GID (e.g., gid://shopify/Product/123456789)
+              Die Shopify Produkt GID (z.B., gid://shopify/Product/123456789)
             </s-text>
           </s-stack>
 
           <s-stack direction="block" gap="tight">
-            <s-text variant="headingSm">Product Name</s-text>
+            <s-text variant="headingSm">Produktname</s-text>
             <input
               type="text"
               value={formData.name}
@@ -149,12 +149,12 @@ export default function EditProduct() {
               }}
             />
             <s-text variant="bodySm" tone="subdued">
-              Display name for this configuration
+              Produktname für diese Konfiguration
             </s-text>
           </s-stack>
 
           <s-stack direction="block" gap="tight">
-            <s-text variant="headingSm">Base Price (€)</s-text>
+            <s-text variant="headingSm">Grundpreis (€)</s-text>
             <input
               type="number"
               step="0.01"
@@ -172,7 +172,7 @@ export default function EditProduct() {
               }}
             />
             <s-text variant="bodySm" tone="subdued">
-              Base price from Shopify (usually 0 if dynamic pricing)
+              Grundpreis von Shopify (normalerweise 0 wenn dynamische Preise)
             </s-text>
           </s-stack>
 
@@ -182,13 +182,13 @@ export default function EditProduct() {
               {...(isLoading ? { loading: true } : {})}
               disabled={!formData.shopifyProductId || !formData.name}
             >
-              Update Product
+              Produkt aktualisieren
             </s-button>
             <s-button
               variant="tertiary"
               onClick={() => navigate("/app/configurator")}
             >
-              Cancel
+              Abbrechen
             </s-button>
           </s-stack>
         </s-stack>

@@ -53,7 +53,7 @@ export default function NewProduct() {
 
   useEffect(() => {
     if (fetcher.data?.success && fetcher.data?.product) {
-      shopify.toast.show("Product created successfully");
+      shopify.toast.show("Produkt erfolgreich erstellt.");
       // Redirect to configurator list
       navigate("/app/configurator");
     } else if (fetcher.data?.error) {
@@ -71,12 +71,12 @@ export default function NewProduct() {
   };
 
   return (
-    <s-page heading="Create New Product Configuration">
+    <s-page heading="Neue Produktkonfiguration erstellen">
       <s-button
         slot="secondary-action"
         onClick={() => navigate("/app/configurator")}
       >
-        Back to List
+        Zurück zur Liste
       </s-button>
 
       <s-section heading="Product Details">
@@ -91,7 +91,7 @@ export default function NewProduct() {
               }
               placeholder="gid://shopify/Product/123456789"
               style={{
-                width: "100%",
+                width: "95%",
                 padding: "8px 12px",
                 border: "1px solid #c9cccf",
                 borderRadius: "4px",
@@ -99,12 +99,12 @@ export default function NewProduct() {
               }}
             />
             <s-text variant="bodySm" tone="subdued">
-              The Shopify product GID (e.g., gid://shopify/Product/123456789)
+              Die Shopify-Produkt-GID (e.g., 123456789)
             </s-text>
           </s-stack>
 
           <s-stack direction="block" gap="tight">
-            <s-text variant="headingSm">Product Name</s-text>
+            <s-text variant="headingSm">Produktname</s-text>
             <input
               type="text"
               value={formData.name}
@@ -113,7 +113,7 @@ export default function NewProduct() {
               }
               placeholder="Insektenschutz Fenster"
               style={{
-                width: "100%",
+                width: "95%",
                 padding: "8px 12px",
                 border: "1px solid #c9cccf",
                 borderRadius: "4px",
@@ -121,12 +121,12 @@ export default function NewProduct() {
               }}
             />
             <s-text variant="bodySm" tone="subdued">
-              Display name for this configuration
+              Anzeigename für diese Konfiguration
             </s-text>
           </s-stack>
 
           <s-stack direction="block" gap="tight">
-            <s-text variant="headingSm">Base Price (€)</s-text>
+            <s-text variant="headingSm">Grundpreis (€)</s-text>
             <input
               type="number"
               step="0.01"
@@ -136,7 +136,7 @@ export default function NewProduct() {
               }
               placeholder="0.00"
               style={{
-                width: "100%",
+                width: "95%",
                 padding: "8px 12px",
                 border: "1px solid #c9cccf",
                 borderRadius: "4px",
@@ -144,7 +144,7 @@ export default function NewProduct() {
               }}
             />
             <s-text variant="bodySm" tone="subdued">
-              Base price from Shopify (usually 0 if dynamic pricing)
+              Grundpreis aus Shopify (in der Regel 0 bei dynamischer Preisgestaltung)
             </s-text>
           </s-stack>
 
@@ -154,25 +154,25 @@ export default function NewProduct() {
               {...(isLoading ? { loading: true } : {})}
               disabled={!formData.shopifyProductId || !formData.name}
             >
-              Create Product
+              Produkt erstellen
             </s-button>
             <s-button
               variant="tertiary"
               onClick={() => navigate("/app/configurator")}
             >
-              Cancel
+              Abbrechen
             </s-button>
           </s-stack>
         </s-stack>
       </s-section>
 
-      <s-section slot="aside" heading="Next Steps">
-        <s-paragraph>After creating the product, you can:</s-paragraph>
+      <s-section slot="aside" heading="Nächste Schritte">
+        <s-paragraph>Nach dem Erstellen des Produkts können Sie:</s-paragraph>
         <s-unordered-list>
-          <s-list-item>Add configuration steps</s-list-item>
-          <s-list-item>Define step options with prices</s-list-item>
-          <s-list-item>Set up measurement ranges</s-list-item>
-          <s-list-item>Configure pricing matrix</s-list-item>
+          <s-list-item>Konfigurationsschritte hinzufügen</s-list-item>
+          <s-list-item>Schrittoptionen mit Preisen definieren</s-list-item>
+          <s-list-item>Messbereiche festlegen</s-list-item>
+          <s-list-item>Preismatrix konfigurieren</s-list-item>
         </s-unordered-list>
       </s-section>
     </s-page>

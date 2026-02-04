@@ -131,7 +131,7 @@ export default function PricingMatrix() {
 
   useEffect(() => {
     if (fetcher.data?.success) {
-      shopify.toast.show("Pricing matrix saved successfully!");
+      shopify.toast.show("Preismatrix erfolgreich gespeichert!");
       revalidator.revalidate();
     } else if (fetcher.data?.error) {
       shopify.toast.show(`Error: ${fetcher.data.error}`);
@@ -162,7 +162,7 @@ export default function PricingMatrix() {
     });
 
     if (pivotData.length === 0) {
-      shopify.toast.show("No valid pricing data to save");
+      shopify.toast.show("Keine gültigen Preisdaten zum Speichern vorhanden.");
       return;
     }
 
@@ -184,7 +184,7 @@ export default function PricingMatrix() {
   const handleDeleteAll = () => {
     if (
       confirm(
-        "Are you sure you want to delete ALL pricing entries? This cannot be undone!",
+        "Sind Sie sicher, dass Sie ALLE Preiseinträge löschen möchten? Dies kann nicht rückgängig gemacht werden!",
       )
     ) {
       const submitData = new FormData();
@@ -206,7 +206,7 @@ export default function PricingMatrix() {
 
   const removeWidthRange = (width) => {
     if (widthRanges.length <= 1) {
-      shopify.toast.show("Must have at least one width range");
+      shopify.toast.show("Mindestens ein Breitenbereich ist erforderlich.");
       return;
     }
     setWidthRanges(widthRanges.filter(w => w !== width));
@@ -220,7 +220,7 @@ export default function PricingMatrix() {
 
   const removeHeightRange = (height) => {
     if (heightRanges.length <= 1) {
-      shopify.toast.show("Must have at least one height range");
+      shopify.toast.show("Mindestens ein Höhenbereich ist erforderlich");
       return;
     }
     setHeightRanges(heightRanges.filter(h => h !== height));
@@ -270,9 +270,9 @@ export default function PricingMatrix() {
 
   if (!product) {
     return (
-      <s-page heading="Product Not Found">
+      <s-page heading="Produkt nicht gefunden">
         <s-section>
-          <s-paragraph>Product not found.</s-paragraph>
+          <s-paragraph>Produkt nicht gefunden.</s-paragraph>
           <s-button onClick={() => navigate("/app/configurator")}>
             Back to List
           </s-button>
@@ -282,41 +282,41 @@ export default function PricingMatrix() {
   }
 
   return (
-    <s-page heading={`Pricing Matrix: ${product.name}`}>
+    <s-page heading={`Preismatrix: ${product.name}`}>
       <s-button
         slot="secondary-action"
         onClick={() => navigate(`/app/configuratoryy/${product.id}`)}
       >
-        Back to Steps
+        Zurück zu den Schritten
       </s-button>
 
-      <s-section heading="Product Information">
+      <s-section heading="Produktinformationen">
         <s-stack direction="block" gap="tight">
           <s-text>
-            <strong>Product:</strong> {product.name}
+            <strong>Produkt:</strong> {product.name}
           </s-text>
           <s-text>
-            <strong>Total Pricing Entries:</strong>{" "}
+            <strong>Gesamtanzahl der Preiseinträge:</strong>{" "}
             {Object.keys(pivotTable).filter(k => pivotTable[k]).length}
           </s-text>
         </s-stack>
       </s-section>
 
-      <s-section heading="Editable Pricing Matrix">
+      <s-section heading="Bearbeitbare Preismatrix">
         <s-stack direction="block" gap="base">
           <s-stack direction="inline" gap="base">
             <s-button
               onClick={handleSavePivotTable}
               {...(isLoading ? { loading: true } : {})}
             >
-              Save All Changes
+              Alle Änderungen speichern
             </s-button>
             <s-button
               variant="tertiary"
               tone="critical"
               onClick={handleDeleteAll}
             >
-              Delete All Entries
+              Alle Einträge löschen
             </s-button>
           </s-stack>
 
@@ -342,7 +342,7 @@ export default function PricingMatrix() {
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span>Height (mm) →<br />Width (mm) ↓</span>
+                      <span>Höhe (mm) →<br />Breite (mm) ↓</span>
                     </div>
                   </th>
                   {heightRanges.map((height, idx) => (
@@ -563,14 +563,14 @@ export default function PricingMatrix() {
           <s-box padding="base" background="subdued" borderRadius="base">
             <s-stack direction="block" gap="tight">
               <s-text variant="bodySm">
-                <strong>Tips:</strong>
+                <strong>Tipps:</strong>
               </s-text>
               <s-unordered-list>
-                <s-list-item>Click any cell to edit the price directly</s-list-item>
-                <s-list-item>Click the header values to edit width/height ranges</s-list-item>
-                <s-list-item>Use + buttons to add new rows/columns</s-list-item>
-                <s-list-item>Use ✕ buttons to remove rows/columns</s-list-item>
-                <s-list-item>Click "Save All Changes" when done</s-list-item>
+                <s-list-item>Klicken Sie auf eine beliebige Zelle, um den Preis direkt zu bearbeiten</s-list-item>
+                <s-list-item>Klicken Sie auf die Kopfzeilenwerte, um Breiten-/Höhenbereiche zu bearbeiten</s-list-item>
+                <s-list-item>Verwenden Sie die +-Schaltflächen, um neue Zeilen/Spalten hinzuzufügen</s-list-item>
+                <s-list-item>Verwenden Sie die ✕-Schaltflächen, um Zeilen/Spalten zu entfernen</s-list-item>
+                <s-list-item>Klicken Sie auf „Alle Änderungen speichern“, wenn Sie fertig sind</s-list-item>
               </s-unordered-list>
             </s-stack>
           </s-box>

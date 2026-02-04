@@ -302,7 +302,7 @@ export default function ConfigureProduct() {
 
       if (data.success) {
         setStepFormData({ ...stepFormData, image: data.imageUrl });
-        shopify.toast.show("Image uploaded successfully");
+        shopify.toast.show("Bild erfolgreich hochgeladen.");
       } else {
         shopify.toast.show(`Upload failed: ${data.error}`);
       }
@@ -330,7 +330,7 @@ export default function ConfigureProduct() {
       const data = await response.json();
       if (data.success) {
         setOptionFormData({ ...optionFormData, image: data.imageUrl });
-        shopify.toast.show("Image uploaded successfully");
+        shopify.toast.show("Bild erfolgreich hochgeladen");
       } else {
         shopify.toast.show(`Upload failed: ${data.error}`);
       }
@@ -425,7 +425,7 @@ export default function ConfigureProduct() {
   };
 
   const handleDeleteStep = (stepId) => {
-    if (confirm("Are you sure you want to delete this configuration step? This will also delete all options within it.")) {
+    if (confirm("Sind Sie sicher, dass Sie diesen Konfigurationsschritt löschen möchten? abei werden auch alle darin enthaltenen Optionen gelöscht.")) {
       const submitData = new FormData();
       submitData.append("action", "deleteStep");
       submitData.append("stepId", stepId);
@@ -434,7 +434,7 @@ export default function ConfigureProduct() {
   };
 
   const handleDeleteOption = (optionId) => {
-    if (confirm("Are you sure you want to delete this option?")) {
+    if (confirm("Sind Sie sicher, dass Sie diese Option löschen möchten?")) {
       const submitData = new FormData();
       submitData.append("action", "deleteOption");
       submitData.append("optionId", optionId);
@@ -444,11 +444,11 @@ export default function ConfigureProduct() {
 
   if (!product) {
     return (
-      <s-page heading="Product Not Found">
+      <s-page heading="Produkt nicht gefunden">
         <s-section>
-          <s-paragraph>Product not found.</s-paragraph>
+          <s-paragraph>Produkt nicht gefunden.</s-paragraph>
           <s-button onClick={() => navigate('/app/configurator')}>
-            Back to Product List
+            Zurück zur Produktliste
           </s-button>
         </s-section>
       </s-page>
@@ -456,31 +456,31 @@ export default function ConfigureProduct() {
   }
 
   return (
-    <s-page heading={`Product Configuration: ${product.name}`}>
+    <s-page heading={`Produktkonfiguration: ${product.name}`}>
       <s-button
         slot="secondary-action"
         onClick={() => navigate('/app/configurator')}
       >
-        ← Back to Products
+        ← Zurück zu den Produkten
       </s-button>
 
       {/* Product Overview Card */}
       <s-section>
         <s-box padding="base" borderWidth="base" borderRadius="base" background="surface">
           <s-stack direction="block" gap="tight">
-            <s-heading variant="headingMd">Product Overview</s-heading>
+            <s-heading variant="headingMd">Produktübersicht  </s-heading>
             <s-divider />
             <s-stack direction="inline" gap="loose" style={{ marginTop: '12px' }}>
               <div style={{ flex: 1 }}>
-                <s-text variant="bodySm" tone="subdued">Shopify Product ID</s-text>
+                <s-text variant="bodySm" tone="subdued">Shopify Product ID  </s-text>
                 <s-text variant="bodyMd"><strong>{product.shopifyProductId}</strong></s-text>
               </div>
               <div style={{ flex: 1 }}>
-                <s-text variant="bodySm" tone="subdued">Base Price</s-text>
+                <s-text variant="bodySm" tone="subdued">Grundpreis  </s-text>
                 <s-text variant="bodyMd"><strong>€{product.basePrice.toFixed(2)}</strong></s-text>
               </div>
               <div style={{ flex: 1 }}>
-                <s-text variant="bodySm" tone="subdued">Configuration Steps</s-text>
+                <s-text variant="bodySm" tone="subdued">Konfigurationsschritte </s-text>
                 <s-text variant="bodyMd"><strong>{product.steps.length}</strong></s-text>
               </div>
             </s-stack>
@@ -491,7 +491,7 @@ export default function ConfigureProduct() {
       {/* Configuration Steps Section */}
       <s-section>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <s-heading variant="headingLg">Configuration Steps</s-heading>
+          <s-heading variant="headingLg">Konfigurationsschritte </s-heading>
           <s-button
             variant="primary"
             onClick={() => {
@@ -523,7 +523,7 @@ export default function ConfigureProduct() {
               }
             }}
           >
-            {showStepForm ? "✕ Cancel" : "+ Add New Step"}
+            {showStepForm ? "✕ Abbrechen" : "+ Schritt hinzufügen"}
           </s-button>
         </div>
 
@@ -542,19 +542,19 @@ export default function ConfigureProduct() {
                 }}
               >
                 <s-stack direction="block" gap="base">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: "10px" }}>
                     <s-heading variant="headingMd">
-                      {editingStep ? "✏️ Edit Step" : "➕ Create New Step"}
+                      {editingStep ? "✏️ Schritt ändern" : "➕ Schritt anlegen"}
                     </s-heading>
-                    <s-badge tone="info">{editingStep ? "Editing Mode" : "New Step"}</s-badge>
+                    <s-badge tone="info">{editingStep ? "Bearbeitungsmodus" : "Neuer Schritt"}</s-badge>
                   </div>
 
                   <s-divider />
 
                   {/* Step Type Selection - Visual Cards */}
-                  <div>
-                    <s-text variant="bodyMd"><strong>Step Type</strong></s-text>
-                    <s-text variant="bodySm" tone="subdued">Choose how customers will interact with this step</s-text>
+                  <div style={{ padding: "10px" }}>
+                    <s-text variant="bodyMd"><strong>Schritttyp </strong></s-text>
+                    <s-text variant="bodySm" tone="subdued">Wählen Sie aus, wie Kunden mit diesem Schritt interagieren sollen</s-text>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
                       <div
                         onClick={() => setStepFormData({ ...stepFormData, type: "OPTIONS" })}
@@ -568,8 +568,8 @@ export default function ConfigureProduct() {
                         }}
                       >
                         <div style={{ fontSize: '24px', marginBottom: '8px' }}>📋</div>
-                        <s-text variant="bodyMd"><strong>Multiple Choice</strong></s-text>
-                        <s-text variant="bodySm" tone="subdued">Let customers select from predefined options</s-text>
+                        <s-text variant="bodyMd"><strong>Mehrfachauswahl </strong></s-text>
+                        <s-text variant="bodySm" tone="subdued">Kunden können aus vordefinierten Optionen auswählen </s-text>
                       </div>
                       <div
                         onClick={() => setStepFormData({ ...stepFormData, type: "MEASUREMENT" })}
@@ -583,21 +583,21 @@ export default function ConfigureProduct() {
                         }}
                       >
                         <div style={{ fontSize: '24px', marginBottom: '8px' }}>📏</div>
-                        <s-text variant="bodyMd"><strong>Measurements</strong></s-text>
-                        <s-text variant="bodySm" tone="subdued">Customers enter custom width & height</s-text>
+                        <s-text variant="bodyMd"><strong>Maße </strong></s-text>
+                        <s-text variant="bodySm" tone="subdued">Kunden geben eine individuelle Breite und Höhe ein.</s-text>
                       </div>
                     </div>
                   </div>
 
                   {/* Basic Information */}
                   <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px' }}>
-                    <s-text variant="bodyMd"><strong>📝 Basic Information</strong></s-text>
+                    <s-text variant="bodyMd"><strong>📝 Grundinformationen </strong></s-text>
                     <s-stack direction="block" gap="base" style={{ marginTop: '12px' }}>
                       <div>
                         <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>Display Title</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
+                          <s-text variant="bodySm"><strong>Anzeigetitel</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
                         </label>
-                        <s-text variant="bodySm" tone="subdued">What customers see (e.g., "Window Type", "Choose Color")</s-text>
+                        <s-text variant="bodySm" tone="subdued">Was Kunden sehen (e.g., "Fenstertyp", "Farbe auswählen")</s-text>
                         <input
                           type="text"
                           value={stepFormData.title}
@@ -605,7 +605,7 @@ export default function ConfigureProduct() {
                           placeholder="e.g., Window Type"
                           required
                           style={{
-                            width: '100%',
+                            width: '95%',
                             padding: '10px 12px',
                             border: '1px solid #c9cccf',
                             borderRadius: '6px',
@@ -617,9 +617,9 @@ export default function ConfigureProduct() {
 
                       <div>
                         <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>Internal Key</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
+                          <s-text variant="bodySm"><strong>Interner Schlüssel </strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
                         </label>
-                        <s-text variant="bodySm" tone="subdued">Unique identifier (lowercase, no spaces, e.g., "window_type")</s-text>
+                        <s-text variant="bodySm" tone="subdued">Eindeutiger Bezeichner (kleingeschrieben, keine Leerzeichen, e.g., "window_type")</s-text>
                         <input
                           type="text"
                           value={stepFormData.key}
@@ -627,7 +627,7 @@ export default function ConfigureProduct() {
                           placeholder="e.g., window_type"
                           required
                           style={{
-                            width: '100%',
+                            width: '95%',
                             padding: '10px 12px',
                             border: '1px solid #c9cccf',
                             borderRadius: '6px',
@@ -640,16 +640,16 @@ export default function ConfigureProduct() {
 
                       <div>
                         <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>Subtitle</strong> (Optional)</s-text>
+                          <s-text variant="bodySm"><strong>Untertitel</strong> (Optional)</s-text>
                         </label>
-                        <s-text variant="bodySm" tone="subdued">Step progress indicator (e.g., "Step 1 of 3")</s-text>
+                        <s-text variant="bodySm" tone="subdued">Schritt-Fortschrittsanzeige (e.g., "Schritt 1 von 3")</s-text>
                         <input
                           type="text"
                           value={stepFormData.subtitle}
                           onChange={(e) => setStepFormData({ ...stepFormData, subtitle: e.target.value })}
-                          placeholder="e.g., Step 1 of 3"
+                          placeholder="e.g., Schritt 1 von 3"
                           style={{
-                            width: '100%',
+                            width: '95%',
                             padding: '10px 12px',
                             border: '1px solid #c9cccf',
                             borderRadius: '6px',
@@ -661,16 +661,16 @@ export default function ConfigureProduct() {
 
                       <div>
                         <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>Description</strong> (Optional)</s-text>
+                          <s-text variant="bodySm"><strong>Beschreibung</strong> (Optional)</s-text>
                         </label>
-                        <s-text variant="bodySm" tone="subdued">Additional help text for customers</s-text>
+                        <s-text variant="bodySm" tone="subdued">Zusätzlicher Hilfetext für Kunden </s-text>
                         <textarea
                           value={stepFormData.description}
                           onChange={(e) => setStepFormData({ ...stepFormData, description: e.target.value })}
-                          placeholder="e.g., Select the type of window you need..."
+                          placeholder="e.g., Wählen Sie den gewünschten Fenstertyp aus..."
                           rows="3"
                           style={{
-                            width: '100%',
+                            width: '95%',
                             padding: '10px 12px',
                             border: '1px solid #c9cccf',
                             borderRadius: '6px',
@@ -683,16 +683,16 @@ export default function ConfigureProduct() {
 
                       <div>
                         <label style={{ display: 'block', marginBottom: '4px' }}>
-                          <s-text variant="bodySm"><strong>🖼️ Step Image</strong> (Optional)</s-text>
+                          <s-text variant="bodySm"><strong>🖼️ Schrittbild</strong> (Optional)</s-text>
                         </label>
-                        <s-text variant="bodySm" tone="subdued">Upload an image to display at the top of this step</s-text>
+                        <s-text variant="bodySm" tone="subdued">Laden Sie ein Bild hoch, das oben in diesem Schritt angezeigt wird </s-text>
                         <input
                           type="file"
                           accept="image/*"
                           onChange={handleStepImageUpload}
                           disabled={uploadingStepImage}
                           style={{
-                            width: '100%',
+                            width: '95%',
                             padding: '10px 12px',
                             border: '2px dashed #c9cccf',
                             borderRadius: '6px',
@@ -704,7 +704,7 @@ export default function ConfigureProduct() {
                         {uploadingStepImage && (
                           <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <s-spinner size="small" />
-                            <s-text variant="bodySm">Uploading image...</s-text>
+                            <s-text variant="bodySm">Bild wird hochgeladen...</s-text>
                           </div>
                         )}
                         {stepFormData.image && (
@@ -746,13 +746,13 @@ export default function ConfigureProduct() {
                   {/* Measurement Ranges (only for MEASUREMENT type) */}
                   {stepFormData.type === "MEASUREMENT" && (
                     <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px' }}>
-                      <s-text variant="bodyMd"><strong>📏 Measurement Ranges (in millimeters)</strong></s-text>
-                      <s-text variant="bodySm" tone="subdued">Set minimum and maximum values customers can enter</s-text>
+                      <s-text variant="bodyMd"><strong>📏 Messbereiche (in Millimetern) </strong></s-text>
+                      <s-text variant="bodySm" tone="subdued">Legen Sie die minimalen und maximalen Werte fest, die Kunden eingeben können.</s-text>
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
                         <div>
                           <label style={{ display: 'block', marginBottom: '4px' }}>
-                            <s-text variant="bodySm"><strong>Width - Minimum (mm)</strong></s-text>
+                            <s-text variant="bodySm"><strong>Breite – Minimum (mm)</strong></s-text>
                           </label>
                           <input
                             type="number"
@@ -760,7 +760,7 @@ export default function ConfigureProduct() {
                             onChange={(e) => setStepFormData({ ...stepFormData, widthMin: e.target.value })}
                             placeholder="e.g., 300"
                             style={{
-                              width: '100%',
+                              width: '95%',
                               padding: '10px 12px',
                               border: '1px solid #c9cccf',
                               borderRadius: '6px',
@@ -770,7 +770,7 @@ export default function ConfigureProduct() {
                         </div>
                         <div>
                           <label style={{ display: 'block', marginBottom: '4px' }}>
-                            <s-text variant="bodySm"><strong>Width - Maximum (mm)</strong></s-text>
+                            <s-text variant="bodySm"><strong>Breite - Maximum (mm)</strong></s-text>
                           </label>
                           <input
                             type="number"
@@ -778,7 +778,7 @@ export default function ConfigureProduct() {
                             onChange={(e) => setStepFormData({ ...stepFormData, widthMax: e.target.value })}
                             placeholder="e.g., 2000"
                             style={{
-                              width: '100%',
+                              width: '95%',
                               padding: '10px 12px',
                               border: '1px solid #c9cccf',
                               borderRadius: '6px',
@@ -788,7 +788,7 @@ export default function ConfigureProduct() {
                         </div>
                         <div>
                           <label style={{ display: 'block', marginBottom: '4px' }}>
-                            <s-text variant="bodySm"><strong>Height - Minimum (mm)</strong></s-text>
+                            <s-text variant="bodySm"><strong>Höhe - Minimum (mm)</strong></s-text>
                           </label>
                           <input
                             type="number"
@@ -796,7 +796,7 @@ export default function ConfigureProduct() {
                             onChange={(e) => setStepFormData({ ...stepFormData, heightMin: e.target.value })}
                             placeholder="e.g., 400"
                             style={{
-                              width: '100%',
+                              width: '95%',
                               padding: '10px 12px',
                               border: '1px solid #c9cccf',
                               borderRadius: '6px',
@@ -806,7 +806,7 @@ export default function ConfigureProduct() {
                         </div>
                         <div>
                           <label style={{ display: 'block', marginBottom: '4px' }}>
-                            <s-text variant="bodySm"><strong>Height - Maximum (mm)</strong></s-text>
+                            <s-text variant="bodySm"><strong>Höhe - Maximum (mm)</strong></s-text>
                           </label>
                           <input
                             type="number"
@@ -814,7 +814,7 @@ export default function ConfigureProduct() {
                             onChange={(e) => setStepFormData({ ...stepFormData, heightMax: e.target.value })}
                             placeholder="e.g., 2000"
                             style={{
-                              width: '100%',
+                              width: '95%',
                               padding: '10px 12px',
                               border: '1px solid #c9cccf',
                               borderRadius: '6px',
@@ -836,7 +836,7 @@ export default function ConfigureProduct() {
                       {...(isLoading ? { loading: true } : {})}
                       disabled={!stepFormData.key || !stepFormData.title}
                     >
-                      {editingStep ? "💾 Update Step" : "✓ Create Step"}
+                      {editingStep ? "💾 Schritt aktualisieren" : "✓ Schritt erstellen"}
                     </s-button>
                     <s-button
                       variant="tertiary"
@@ -845,7 +845,7 @@ export default function ConfigureProduct() {
                         setEditingStep(null);
                       }}
                     >
-                      Cancel
+                      Abbrechen
                     </s-button>
                   </s-stack>
                 </s-stack>
@@ -857,8 +857,8 @@ export default function ConfigureProduct() {
           {product.steps.length === 0 && !showStepForm ? (
             <s-box padding="loose" borderWidth="base" borderRadius="base" style={{ textAlign: 'center', padding: '48px' }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
-              <s-heading variant="headingMd">No Configuration Steps Yet</s-heading>
-              <s-text tone="subdued">Get started by creating your first configuration step above</s-text>
+              <s-heading variant="headingMd">Noch keine Konfigurationsschritte vorhanden </s-heading>
+              <s-text tone="subdued">Beginnen Sie, indem Sie oben Ihren ersten Konfigurationsschritt erstellen </s-text>
             </s-box>
           ) : (
             product.steps.map((step, index) => (
@@ -871,7 +871,7 @@ export default function ConfigureProduct() {
               >
                 <s-stack direction="block" gap="base">
                   {/* Step Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '12px' }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                         <s-badge tone="info">Step {step.order}</s-badge>
@@ -889,14 +889,14 @@ export default function ConfigureProduct() {
                         variant="secondary"
                         onClick={() => handleEditStep(step)}
                       >
-                        ✏️ Edit
+                        ✏️ Bearbeiten
                       </s-button>
                       <s-button
                         variant="tertiary"
                         tone="critical"
                         onClick={() => handleDeleteStep(step.id)}
                       >
-                        🗑️ Delete
+                        🗑️ Löschen
                       </s-button>
                     </s-stack>
                   </div>
@@ -907,12 +907,12 @@ export default function ConfigureProduct() {
                   <div style={{ background: '#f9fafb', padding: '12px', borderRadius: '6px' }}>
                     <s-stack direction="inline" gap="loose">
                       <div>
-                        <s-text variant="bodySm" tone="subdued">Internal Key</s-text>
-                        <s-text variant="bodyMd" style={{ fontFamily: 'monospace', fontSize: '13px' }}>{step.key}</s-text>
+                        <s-text variant="bodySm" tone="subdued">Interner Schlüssel </s-text>
+                        <s-text variant="bodyMd" style={{ fontFamily: 'monospace', fontSize: '13px' }}>{step.key} </s-text>
                       </div>
                       {step.description && (
                         <div style={{ flex: 1 }}>
-                          <s-text variant="bodySm" tone="subdued">Description</s-text>
+                          <s-text variant="bodySm" tone="subdued">Beschreibung </s-text>
                           <s-text variant="bodyMd">{step.description}</s-text>
                         </div>
                       )}
@@ -921,32 +921,34 @@ export default function ConfigureProduct() {
 
                   {/* Step Image */}
                   {step.image && (
-                    <div>
-                      <s-text variant="bodySm" tone="subdued" style={{ marginBottom: '8px', display: 'block' }}>Step Image</s-text>
-                      <img
-                        src={step.image}
-                        alt={step.title}
-                        style={{
-                          maxWidth: '300px',
-                          maxHeight: '200px',
-                          borderRadius: '6px',
-                          border: '1px solid #e1e3e5'
-                        }}
-                      />
+                    <div style={{ marginBottom: '8px', display: 'block', marginLeft: '12px' }}>
+                      <s-text variant="bodySm" tone="subdued" style={{ marginBottom: '8px', display: 'block' }}>Bild des Schritts</s-text>
+                      <s-box>
+                        <img
+                          src={step.image}
+                          alt={step.title}
+                          style={{
+                            maxWidth: '300px',
+                            maxHeight: '200px',
+                            borderRadius: '6px',
+                            border: '1px solid #e1e3e5'
+                          }}
+                        />
+                      </s-box>
                     </div>
                   )}
 
                   {/* Measurement Ranges Display */}
                   {step.type === "MEASUREMENT" && (
                     <div style={{ background: '#fef3c7', padding: '16px', borderRadius: '6px' }}>
-                      <s-text variant="bodyMd"><strong>📏 Measurement Ranges</strong></s-text>
+                      <s-text variant="bodyMd"><strong>📏 Messbereiche</strong></s-text>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
                         <div>
-                          <s-text variant="bodySm" tone="subdued">Width Range</s-text>
+                          <s-text variant="bodySm" tone="subdued">Breite - Bereich</s-text>
                           <s-text variant="bodyMd"><strong>{step.widthMin} mm - {step.widthMax} mm</strong></s-text>
                         </div>
                         <div>
-                          <s-text variant="bodySm" tone="subdued">Height Range</s-text>
+                          <s-text variant="bodySm" tone="subdued">Höhe - Bereich</s-text>
                           <s-text variant="bodyMd"><strong>{step.heightMin} mm - {step.heightMax} mm</strong></s-text>
                         </div>
                       </div>
@@ -958,8 +960,8 @@ export default function ConfigureProduct() {
                     <>
                       <s-divider />
                       <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                          <s-heading variant="headingSm">Customer Choices ({step.options.length})</s-heading>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', padding: '12px' }}>
+                          <s-heading variant="headingSm">Kundenauswahl  ({step.options.length})</s-heading>
                           <s-button
                             variant="secondary"
                             size="slim"
@@ -985,7 +987,7 @@ export default function ConfigureProduct() {
                               }, 100);
                             }}
                           >
-                            + Add Choice
+                            + Auswahl hinzufügen
                           </s-button>
                         </div>
 
@@ -998,7 +1000,7 @@ export default function ConfigureProduct() {
                             border: '2px dashed #e1e3e5'
                           }}>
                             <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎯</div>
-                            <s-text tone="subdued">No choices added yet. Add options for customers to select from.</s-text>
+                            <s-text tone="subdued">Noch keine Auswahl hinzugefügt. Optionen für Kunden hinzufügen.</s-text>
                           </div>
                         ) : (
                           <s-stack direction="block" gap="tight">
@@ -1057,7 +1059,7 @@ export default function ConfigureProduct() {
                                         marginTop: '8px',
                                         display: 'inline-block'
                                       }}>
-                                        <s-text variant="bodySm"><strong>Next Steps:</strong> {option.showSteps}</s-text>
+                                        <s-text variant="bodySm"><strong>Nächste Schritte: </strong> {option.showSteps}</s-text>
                                       </div>
                                     )}
                                   </div>
@@ -1072,7 +1074,7 @@ export default function ConfigureProduct() {
                                         handleEditOption(option, step.id);
                                       }}
                                     >
-                                      Edit
+                                      Bearbeiten
                                     </s-button>
                                     <s-button
                                       variant="tertiary"
@@ -1080,7 +1082,7 @@ export default function ConfigureProduct() {
                                       size="slim"
                                       onClick={() => handleDeleteOption(option.id)}
                                     >
-                                      Delete
+                                      Löschen
                                     </s-button>
                                   </div>
                                 </div>
@@ -1105,10 +1107,10 @@ export default function ConfigureProduct() {
                               <s-stack direction="block" gap="base">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                   <s-heading variant="headingSm">
-                                    {editingOption ? "✏️ Edit Choice" : "➕ Add New Choice"}
+                                    {editingOption ? "✏️ Auswahl bearbeiten" : "➕ Neue Auswahl hinzufügen"}
                                   </s-heading>
                                   <s-badge tone={editingOption ? "warning" : "info"}>
-                                    {editingOption ? "Editing" : "New"}
+                                    {editingOption ? "Bearbeiten" : "Neu"}
                                   </s-badge>
                                 </div>
 
@@ -1116,9 +1118,9 @@ export default function ConfigureProduct() {
 
                                 <div>
                                   <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>Choice Name</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
+                                    <s-text variant="bodySm"><strong>Auswahlbezeichnung </strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
                                   </label>
-                                  <s-text variant="bodySm" tone="subdued">What customers will see (e.g., "Standard Window")</s-text>
+                                  <s-text variant="bodySm" tone="subdued">Was Kunden sehen (e.g., "Standardfenster") </s-text>
                                   <input
                                     type="text"
                                     value={optionFormData.label}
@@ -1126,7 +1128,7 @@ export default function ConfigureProduct() {
                                     placeholder="e.g., Standard Window"
                                     required
                                     style={{
-                                      width: '100%',
+                                      width: '95%',
                                       padding: '10px 12px',
                                       border: '1px solid #c9cccf',
                                       borderRadius: '6px',
@@ -1138,9 +1140,9 @@ export default function ConfigureProduct() {
 
                                 <div>
                                   <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>Internal Value</strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
+                                    <s-text variant="bodySm"><strong>Interner Wert </strong> <span style={{ color: '#bf0711' }}>*</span></s-text>
                                   </label>
-                                  <s-text variant="bodySm" tone="subdued">Unique code for this choice (lowercase, no spaces)</s-text>
+                                  <s-text variant="bodySm" tone="subdued">Eindeutiger Code für diese Auswahl (klein, keine Leerzeichen)</s-text>
                                   <input
                                     type="text"
                                     value={optionFormData.value}
@@ -1148,7 +1150,7 @@ export default function ConfigureProduct() {
                                     placeholder="e.g., standard_window"
                                     required
                                     style={{
-                                      width: '100%',
+                                      width: '95%',
                                       padding: '10px 12px',
                                       border: '1px solid #c9cccf',
                                       borderRadius: '6px',
@@ -1161,16 +1163,16 @@ export default function ConfigureProduct() {
 
                                 <div>
                                   <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>Description</strong> (Optional)</s-text>
+                                    <s-text variant="bodySm"><strong>Beschreibung</strong> (Optional)</s-text>
                                   </label>
-                                  <s-text variant="bodySm" tone="subdued">Additional details to help customers decide</s-text>
+                                  <s-text variant="bodySm" tone="subdued">Zusätzliche Details, um Kunden bei der Entscheidung zu helfen</s-text>
                                   <input
                                     type="text"
                                     value={optionFormData.description}
                                     onChange={(e) => setOptionFormData({ ...optionFormData, description: e.target.value })}
-                                    placeholder="e.g., Perfect for rectangular windows"
+                                    placeholder="e.g., Perfekt für rechteckige Fenster"
                                     style={{
-                                      width: '100%',
+                                      width: '95%',
                                       padding: '10px 12px',
                                       border: '1px solid #c9cccf',
                                       borderRadius: '6px',
@@ -1182,9 +1184,9 @@ export default function ConfigureProduct() {
 
                                 <div>
                                   <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>💰 Additional Price</strong></s-text>
+                                    <s-text variant="bodySm"><strong>💰 Zusätzliche Kosten</strong></s-text>
                                   </label>
-                                  <s-text variant="bodySm" tone="subdued">Extra cost for this choice (leave 0 for no additional charge)</s-text>
+                                  <s-text variant="bodySm" tone="subdued">Extra Kosten für diese Auswahl (lassen Sie 0 für keine zusätzlichen Kosten)</s-text>
                                   <div style={{ position: 'relative', marginTop: '6px' }}>
                                     <span style={{
                                       position: 'absolute',
@@ -1202,7 +1204,7 @@ export default function ConfigureProduct() {
                                       onChange={(e) => setOptionFormData({ ...optionFormData, price: e.target.value })}
                                       placeholder="0.00"
                                       style={{
-                                        width: '100%',
+                                        width: '95%',
                                         padding: '10px 12px 10px 28px',
                                         border: '1px solid #c9cccf',
                                         borderRadius: '6px',
@@ -1214,16 +1216,16 @@ export default function ConfigureProduct() {
 
                                 <div>
                                   <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>🖼️ Choice Image</strong> (Optional)</s-text>
+                                    <s-text variant="bodySm"><strong>🖼️ Auswahlbild</strong> (Optional)</s-text>
                                   </label>
-                                  <s-text variant="bodySm" tone="subdued">Visual representation of this choice</s-text>
+                                  <s-text variant="bodySm" tone="subdued">Visuelle Darstellung dieser Auswahl</s-text>
                                   <input
                                     type="file"
                                     accept="image/*"
                                     onChange={handleOptionImageUpload}
                                     disabled={uploadingOptionImage}
                                     style={{
-                                      width: '100%',
+                                      width: '95%',
                                       padding: '10px 12px',
                                       border: '2px dashed #c9cccf',
                                       borderRadius: '6px',
@@ -1235,7 +1237,7 @@ export default function ConfigureProduct() {
                                   {uploadingOptionImage && (
                                     <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                       <s-spinner size="small" />
-                                      <s-text variant="bodySm">Uploading image...</s-text>
+                                      <s-text variant="bodySm">Bild wird hochgeladen...</s-text>
                                     </div>
                                   )}
                                   {optionFormData.image && (
@@ -1274,11 +1276,11 @@ export default function ConfigureProduct() {
 
                                 <div>
                                   <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>🔀 Conditional Flow</strong> (Advanced)</s-text>
+                                    <s-text variant="bodySm"><strong>🔀 Bedingter Fluss</strong> (Fortgeschritten)</s-text>
                                   </label>
-                                  <s-text variant="bodySm" tone="subdued">Show specific next steps when this choice is selected</s-text>
+                                  <s-text variant="bodySm" tone="subdued">Zeige spezifische nächste Schritte, wenn diese Wahl ausgewählt wird</s-text>
                                   <s-text variant="bodySm" tone="subdued" style={{ display: 'block', marginTop: '4px', fontStyle: 'italic' }}>
-                                    Format: ["step_key_1", "step_key_2"] or leave empty to show all steps
+                                    Format: ["step_key_1", "step_key_2"] oder leer lassen, um alle Schritte zu zeigen
                                   </s-text>
                                   <input
                                     type="text"
@@ -1286,7 +1288,7 @@ export default function ConfigureProduct() {
                                     onChange={(e) => setOptionFormData({ ...optionFormData, showSteps: e.target.value })}
                                     placeholder='e.g., ["color_selection", "measurements"]'
                                     style={{
-                                      width: '100%',
+                                      width: '95%',
                                       padding: '10px 12px',
                                       border: '1px solid #c9cccf',
                                       borderRadius: '6px',
@@ -1306,7 +1308,7 @@ export default function ConfigureProduct() {
                                     {...(isLoading ? { loading: true } : {})}
                                     disabled={!optionFormData.value || !optionFormData.label}
                                   >
-                                    {editingOption ? "💾 Update Choice" : "✓ Save Choice"}
+                                    {editingOption ? "💾 Aktualisieren" : "✓ Speichern"}
                                   </s-button>
                                   <s-button
                                     variant="tertiary"
@@ -1315,7 +1317,7 @@ export default function ConfigureProduct() {
                                       setEditingOption(null);
                                     }}
                                   >
-                                    Cancel
+                                    Abbrechen
                                   </s-button>
                                 </s-stack>
                               </s-stack>
@@ -1336,24 +1338,24 @@ export default function ConfigureProduct() {
       <s-section slot="aside">
         <s-box padding="base" borderWidth="base" borderRadius="base" background="surface">
           <s-stack direction="block" gap="base">
-            <s-heading variant="headingSm">💡 Quick Tips</s-heading>
+            <s-heading variant="headingSm">💡 Tipps</s-heading>
             <s-divider />
             <s-stack direction="block" gap="tight">
               <div>
-                <s-text variant="bodySm"><strong>✓ Step Types:</strong></s-text>
-                <s-text variant="bodySm" tone="subdued">Use "Multiple Choice" for predefined options, "Measurements" for custom dimensions</s-text>
+                <s-text variant="bodySm"><strong>✓ Schrittarten:</strong></s-text>
+                <s-text variant="bodySm" tone="subdued">Verwenden Sie "Multiple Choice" für vorgegebene Optionen, "Measurements" für benutzerdefinierte Dimensionen</s-text>
               </div>
               <div>
-                <s-text variant="bodySm"><strong>✓ Images:</strong></s-text>
-                <s-text variant="bodySm" tone="subdued">Add images to help customers visualize their choices</s-text>
+                <s-text variant="bodySm"><strong>✓ Bilder:</strong></s-text>
+                <s-text variant="bodySm" tone="subdued">Fügen Sie Bilder hinzu, um Kunden bei der Visualisierung ihrer Auswahl zu helfen</s-text>
               </div>
               <div>
                 <s-text variant="bodySm"><strong>✓ Pricing:</strong></s-text>
-                <s-text variant="bodySm" tone="subdued">Set additional costs for premium options</s-text>
+                <s-text variant="bodySm" tone="subdued">Setzen Sie zusätzliche Kosten für Premium-Optionen</s-text>
               </div>
               <div>
                 <s-text variant="bodySm"><strong>✓ Flow Control:</strong></s-text>
-                <s-text variant="bodySm" tone="subdued">Use conditional steps to create dynamic configuration paths</s-text>
+                <s-text variant="bodySm" tone="subdued">Verwenden Sie bedingte Schritte, um dynamische Konfigurationspfade zu erstellen</s-text>
               </div>
             </s-stack>
           </s-stack>
@@ -1361,13 +1363,13 @@ export default function ConfigureProduct() {
 
         <s-box padding="base" borderWidth="base" borderRadius="base" background="surface" style={{ marginTop: '16px' }}>
           <s-stack direction="block" gap="tight">
-            <s-heading variant="headingSm">📚 Best Practices</s-heading>
+            <s-heading variant="headingSm">📚 Tipps</s-heading>
             <s-divider />
             <s-unordered-list>
-              <s-list-item>Keep step titles clear and concise</s-list-item>
-              <s-list-item>Use descriptive labels for all choices</s-list-item>
-              <s-list-item>Test the flow from a customer's perspective</s-list-item>
-              <s-list-item>Add images whenever possible</s-list-item>
+              <s-list-item>Schrittüberschriften sind klar und prägnant</s-list-item>
+              <s-list-item>Verwenden Sie für alle Optionen beschreibende Etiketten</s-list-item>
+              <s-list-item>Testen Sie den Fluss von der Perspektive des Kunden</s-list-item>
+              <s-list-item>Fügen Sie Bilder hinzu, wenn möglich</s-list-item>
             </s-unordered-list>
           </s-stack>
         </s-box>

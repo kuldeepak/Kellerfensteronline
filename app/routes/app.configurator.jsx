@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useFetcher, useNavigate } from "react-router";
+import { useFetcher, useNavigate, useRevalidator } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
@@ -48,6 +48,7 @@ export default function Configurator() {
   const shopify = useAppBridge();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const revalidator = useRevalidator();
 
   useEffect(() => {
     fetch("/api/configurator?action=getProducts")
@@ -66,8 +67,9 @@ export default function Configurator() {
 
   useEffect(() => {
     if (fetcher.data?.success) {
-      shopify.toast.show("Product deleted successfully");
-      window.location.reload();
+      shopify.toast.show("Produkt erfolgreich gelöscht");
+      // window.location.reload();
+      revalidator.revalidate();
     } else if (fetcher.data?.error) {
       shopify.toast.show(`Error: ${fetcher.data.error}`);
     }
@@ -80,7 +82,7 @@ export default function Configurator() {
   const handleDeleteProduct = (productId) => {
     if (
       confirm(
-        "Are you sure you want to delete this product? All steps, options, and pricing will be deleted!",
+        "Sind Sie sicher, dass Sie dieses Produkt löschen möchten? Alle Schritte, Optionen und Preise werden gelöscht!",
       )
     ) {
       const submitData = new FormData();
@@ -91,25 +93,24 @@ export default function Configurator() {
   };
 
   return (
-    <s-page heading="Product Configurator">
+    <s-page heading="Produkt-Konfigurator">
       <s-button slot="primary-action" onClick={handleCreateProduct}>
-        Add New Product
+        Neues Produkt hinzufügen
       </s-button>
 
-      <s-section heading="Configured Products">
+      <s-section heading="Konfigurierte Produkte">
         <s-paragraph>
-          Manage product configurations, steps, options, and pricing matrices.
+          Produktkonfigurationen, Schritte, Optionen und Preismatrizen verwalten.
         </s-paragraph>
 
         {loading ? (
-          <s-paragraph>Loading products...</s-paragraph>
+          <s-paragraph>Produkte laden...</s-paragraph>
         ) : products.length === 0 ? (
           <s-box padding="base" borderWidth="base" borderRadius="base">
             <s-stack direction="block" gap="base">
-              <s-heading>No products configured yet</s-heading>
+              <s-heading>Noch keine Produkte konfiguriert.</s-heading>
               <s-paragraph>
-                Click "Add New Product" to create your first product
-                configuration.
+                Klicken Sie auf "Neues Produkt hinzufügen", um Ihre erste Konfiguration zu erstellen.
               </s-paragraph>
             </s-stack>
           </s-box>
@@ -137,7 +138,7 @@ export default function Configurator() {
                       tone="critical"
                       onClick={() => handleDeleteProduct(product.id)}
                     >
-                      Delete Product
+                      Produkt löschen
                     </s-button>
                   </s-stack>
 
@@ -148,12 +149,12 @@ export default function Configurator() {
                   </s-paragraph>
                   <s-paragraph>
                     <s-text>
-                      <strong>Steps:</strong> {product.steps?.length || 0}
+                      <strong>Schritte:</strong> {product.steps?.length || 0}
                     </s-text>
                   </s-paragraph>
                   <s-paragraph>
                     <s-text>
-                      <strong>Base Price:</strong>{" "}
+                      <strong>Grundpreis:</strong>{" "}
                       {product.basePrice.toFixed(2)} €
                     </s-text>
                   </s-paragraph>
@@ -163,7 +164,7 @@ export default function Configurator() {
                         navigate(`/app/configuratoryy/${product.id}`)
                       }
                     >
-                      Configure Steps
+                      Schritte konfigurieren
                     </s-button>
                     <s-button
                       variant="secondary"
@@ -171,7 +172,7 @@ export default function Configurator() {
                         navigate(`/app/configuratoryyy/pricing/${product.id}`)
                       }
                     >
-                      Manage Pricing
+                      Preise verwalten
                     </s-button>
                     <s-button
                       variant="tertiary"
@@ -179,7 +180,7 @@ export default function Configurator() {
                         navigate(`/app/configuratore/edit/${product.id}`)
                       }
                     >
-                      Edit Product
+                      Produkt bearbeiten
                     </s-button>
                   </s-stack>
                 </s-stack>
@@ -189,12 +190,12 @@ export default function Configurator() {
         )}
       </s-section>
 
-      <s-section slot="aside" heading="Quick Guide">
+      <s-section slot="aside" heading="Kurzanleitung">
         <s-unordered-list>
-          <s-list-item>Create a product configuration</s-list-item>
-          <s-list-item>Add steps (options or measurements)</s-list-item>
-          <s-list-item>Configure step options with prices</s-list-item>
-          <s-list-item>Set up pricing matrix for measurements</s-list-item>
+          <s-list-item>Produktkonfiguration erstellen</s-list-item>
+          <s-list-item>Schritte hinzufügen (Optionen oder Maße)</s-list-item>
+          <s-list-item>Schrittoptionen mit Preisen konfigurieren</s-list-item>
+          <s-list-item>Preismatrix für Maße einrichten</s-list-item>
         </s-unordered-list>
       </s-section>
     </s-page>
