@@ -6,6 +6,145 @@ let PRODUCT_CONFIG = null; // Will be loaded from API
 let PRODUCT_ID = null; // Shopify Product ID
 
 /* =====================================================
+   STATE - GLOBAL SCOPE
+===================================================== */
+let state = {
+    selections: {},
+    measurements: {},
+    menge: 1
+};
+
+/* =====================================================
+   URL STATE MANAGEMENT
+===================================================== */
+
+// Function to update URL with current state
+function updateURL() {
+    const currentParams = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams();
+
+    // Whitelist: keep ONLY these existing params
+    ['product_id', 'img', 'color'].forEach(key => {
+        if (currentParams.has(key)) {
+            params.set(key, currentParams.get(key));
+        }
+    });
+
+    // Add / update selections
+    Object.entries(state.selections).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+            params.set(`sel_${key}`, value);
+        }
+    });
+
+    // Add / update measurements
+    Object.entries(state.measurements).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+            params.set(`m_${key}`, value);
+        }
+    });
+
+    // Quantity (only if not 1)
+    if (state.menge && state.menge !== 1) {
+        params.set('qty', state.menge);
+    }
+
+    // Update URL without reload
+    const newURL = `${window.location.pathname}?${params.toString()}`;
+    window.history.pushState(
+        { state: JSON.parse(JSON.stringify(state)) },
+        '',
+        newURL
+    );
+}
+
+
+// Function to load state from URL
+function loadStateFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const urlState = {
+        selections: {},
+        measurements: {},
+        menge: 1
+    };
+
+    // Load selections (sel_*)
+    for (const [key, value] of params.entries()) {
+        if (key.startsWith('sel_')) {
+            const actualKey = key.replace('sel_', '');
+            urlState.selections[actualKey] = value;
+        }
+    }
+
+    // Load measurements (m_*)
+    for (const [key, value] of params.entries()) {
+        if (key.startsWith('m_')) {
+            const actualKey = key.replace('m_', '');
+            urlState.measurements[actualKey] = Number(value);
+        }
+    }
+
+    // Load quantity
+    const qty = params.get('qty');
+    if (qty) {
+        urlState.menge = Number(qty);
+    }
+
+    return urlState;
+}
+
+// Function to apply loaded state to UI
+function applyStateToUI(loadedState) {
+    // Apply selections
+    Object.entries(loadedState.selections).forEach(([key, value]) => {
+        const radio = document.querySelector(`input[name="${key}"][value="${value}"]`);
+        if (radio) {
+            radio.checked = true;
+        }
+    });
+
+    // Apply measurements
+    Object.entries(loadedState.measurements).forEach(([key, value]) => {
+        const input = document.querySelector(`input[name="${key}"]`);
+        if (input) {
+            input.value = value;
+        }
+    });
+
+    // Apply quantity
+    if (loadedState.menge) {
+        const qtyDisplay = document.querySelector(".qty-value");
+        if (qtyDisplay) {
+            qtyDisplay.textContent = loadedState.menge;
+        }
+    }
+}
+
+// Handle browser back/forward buttons
+function setupPopStateHandler() {
+    window.addEventListener('popstate', (event) => {
+        if (event.state && event.state.state) {
+            // Restore state from history
+            Object.assign(state, event.state.state);
+
+            // Reapply to UI
+            applyStateToUI(state);
+
+            // Update summaries and prices
+            updateSummaryAlt();
+            renderFinalStep();
+            updatePrices();
+
+            // Handle conditional flow if needed
+            const firstSelection = Object.keys(state.selections)[0];
+            if (firstSelection) {
+                handleDependencies(firstSelection, state.selections[firstSelection]);
+            }
+        }
+    });
+}
+
+/* =====================================================
    API FUNCTIONS
 ===================================================== */
 
@@ -261,12 +400,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     /* 2️⃣ Cache steps AFTER render */
     const steps = document.querySelectorAll(".config-step");
 
-    /* 3️⃣ State */
-    const state = {
-        selections: {},
-        measurements: {},
-        menge: 1
-    };
+    /* 3️⃣ Load state from URL and merge */
+    const urlState = loadStateFromURL();
+
+    // Merge URL state into global state
+    state.selections = { ...state.selections, ...urlState.selections };
+    state.measurements = { ...state.measurements, ...urlState.measurements };
+    state.menge = urlState.menge || state.menge;
+
+    // Setup browser back/forward handling
+    setupPopStateHandler();
+
+    // Set initial history state
+    window.history.replaceState({ state: JSON.parse(JSON.stringify(state)) }, '', window.location.href);
 
     /* =====================================================
        CONDITIONAL FLOW HANDLER
@@ -317,6 +463,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Rebuild summaries
         buildSummaries(PRODUCT_CONFIG);
         updateSummaryAlt();
+        renderFinalStep();
         updatePrices();
     }
 
@@ -367,7 +514,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
     /* =====================================================
-       INPUT HANDLING
+       INPUT HANDLING - WITH URL UPDATE
     ===================================================== */
     document.querySelectorAll("#configuratorSteps input").forEach(input => {
         input.addEventListener("input", () => {
@@ -383,7 +530,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             updateSummaryAlt();
+            renderFinalStep();
             updatePrices();
+
+            // 🔥 UPDATE URL WITH NEW STATE
+            updateURL();
         });
     });
 
@@ -510,7 +661,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         state.menge++;
         document.querySelector(".qty-value").textContent = state.menge;
         updateSummaryAlt();
+        renderFinalStep();
         updatePrices();
+        updateURL(); // 🔥 Update URL when quantity changes
     });
 
     document.querySelector(".qty-minus")?.addEventListener("click", () => {
@@ -519,6 +672,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.querySelector(".qty-value").textContent = state.menge;
             updateSummaryAlt();
             updatePrices();
+            renderFinalStep();
+            updateURL(); // 🔥 Update URL when quantity changes
         }
     });
 
@@ -631,8 +786,57 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+    // ============================================
+    // APPLY LOADED STATE TO UI (After rendering)
+    // ============================================
+    if (Object.keys(state.selections).length > 0 || Object.keys(state.measurements).length > 0) {
+        // Wait for DOM to be fully ready
+        setTimeout(() => {
+            // First, restore the conditional flow based on first selection
+            const firstSelectionKey = Object.keys(state.selections)[0];
+            if (firstSelectionKey) {
+                const step = PRODUCT_CONFIG.steps.find(s => s.key === firstSelectionKey);
+                const selectedValue = state.selections[firstSelectionKey];
 
+                if (step && step.options) {
+                    const option = step.options.find(o => o.value === selectedValue);
+                    if (option && option.showSteps) {
+                        // Set active flow WITHOUT resetting state
+                        activeFlow = [firstSelectionKey, ...option.showSteps];
 
+                        // Hide all steps first
+                        document.querySelectorAll(".config-step").forEach(el => {
+                            el.classList.add("is-disabled");
+                        });
+
+                        // Show only relevant steps
+                        activeFlow.forEach(key => {
+                            showStepByKey(key);
+                        });
+
+                        // Show final step if config is complete
+                        const finalStep = document.getElementById("finalStep");
+                        if (finalStep && isConfigurationComplete()) {
+                            renderFinalStep();
+                            finalStep.classList.remove("is-disabled");
+                        }
+                    }
+                }
+            }
+
+            // NOW apply state to UI (after flow is set)
+            applyStateToUI(state);
+
+            // Rebuild summaries with correct flow
+            buildSummaries(PRODUCT_CONFIG);
+            updateSummaryAlt();
+
+            // Render final step to populate finalSummary table
+            renderFinalStep();
+
+            updatePrices();
+        }, 100);
+    }
 
     // for add to cart
     /* =====================================================
@@ -717,6 +921,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.log('Adding variant to cart:', variantId);
 
             // Step 5: Add to cart
+            const fullURL = window.location.href;
+            const params = new URLSearchParams(window.location.search);
+            const colorFromURL = params.get('color');
             const cartResponse = await fetch('/cart/add.js', {
                 method: 'POST',
                 headers: {
@@ -740,6 +947,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                                     ([key, value]) => [`${key}`, String(value)]
                                 )
                             ),
+                            // color from URL (only if exists)
+                            ...(colorFromURL ? { color: colorFromURL } : {}),
+
+                            // hidden properties
+                            _url: fullURL
                         }
                     }]
                 })
