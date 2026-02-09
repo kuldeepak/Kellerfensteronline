@@ -49,6 +49,7 @@ export default function Configurator() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const revalidator = useRevalidator();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     fetch("/api/configurator?action=getProducts")
@@ -63,13 +64,14 @@ export default function Configurator() {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [refreshKey]);
 
   useEffect(() => {
     if (fetcher.data?.success) {
       shopify.toast.show("Produkt erfolgreich gelöscht");
       // window.location.reload();
-      revalidator.revalidate();
+      // revalidator.revalidate();
+      setRefreshKey(prev => prev + 1); // Trigger refetch
     } else if (fetcher.data?.error) {
       shopify.toast.show(`Error: ${fetcher.data.error}`);
     }
