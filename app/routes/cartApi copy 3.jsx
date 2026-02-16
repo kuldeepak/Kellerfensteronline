@@ -45,7 +45,7 @@ export const action = async ({ request }) => {
     }
 
     const body = await request.json();
-    // console.log('Request body:', body);
+    console.log('Request body:', body);
 
     const {
       productId,
@@ -297,76 +297,6 @@ export const action = async ({ request }) => {
       console.log('Product published to Online Store');
     } else {
       console.warn('Online Store channel not found');
-    }
-
-
-    // ============================================
-    // 2️⃣.5 SET INVENTORY QUANTITY
-    // ============================================
-
-    // Get first available location
-    const locationRes = await admin.graphql(`
-  query {
-    locations(first: 1) {
-      edges {
-        node {
-          id
-          name
-        }
-      }
-    }
-  }
-`);
-
-    const locationData = await locationRes.json();
-    const locationId = locationData.data.locations.edges[0]?.node?.id;
-    console.log('Location ID:', locationId);
-
-    if (!locationId) {
-      throw new Error("No location found to set inventory.");
-    }
-
-    const setInventoryRes = await admin.graphql(`
-  mutation InventorySetQuantities($input: InventorySetQuantitiesInput!) {
-    inventorySetQuantities(input: $input) {
-      inventoryAdjustmentGroup {
-        createdAt
-        reason
-        changes {
-          name
-          delta
-        }
-      }
-      userErrors {
-        field
-        message
-      }
-    }
-  }
-`, {
-      variables: {
-        input: {
-          reason: "correction",
-          name: "available",
-          ignoreCompareQuantity: true,  // ✅ ADD THIS
-          quantities: [
-            {
-              inventoryItemId: variant.inventoryItem.id,
-              locationId: locationId,
-              quantity: 999
-            }
-          ]
-        }
-      }
-    });
-
-    const setInventoryData = await setInventoryRes.json();
-    // console.log('Inventory set response:', setInventoryData);
-
-    // Check for errors
-    if (setInventoryData.data.inventorySetQuantities.userErrors.length > 0) {
-      console.error('Inventory errors:', setInventoryData.data.inventorySetQuantities.userErrors);
-      throw new Error(`Failed to set inventory: ${JSON.stringify(setInventoryData.data.inventorySetQuantities.userErrors)}`);
     }
 
     // ============================================
