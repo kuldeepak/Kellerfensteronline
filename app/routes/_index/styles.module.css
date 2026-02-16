@@ -57,7 +57,7 @@
   gap: 2rem;
 }
 
-.list > li {
+.list>li {
   max-width: 20rem;
   text-align: left;
 }
@@ -67,7 +67,18 @@
     display: block;
   }
 
-  .list > li {
+  .list>li {
     padding-bottom: 1rem;
+  }
+}
+
+@media (min-width: 48rem),
+(pointer: fine) {
+  .text {
+    font-size: 18px;
+    padding: 5px 0px;
+    font-weight: 600;
+    line-height: normal;
+    letter-spacing: 0;
   }
 }

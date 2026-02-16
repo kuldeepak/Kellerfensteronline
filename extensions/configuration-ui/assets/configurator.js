@@ -924,6 +924,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             const fullURL = window.location.href;
             const params = new URLSearchParams(window.location.search);
             const colorFromURL = params.get('color');
+            // Add a 2-second delay before adding to cart (adjust as needed)
+            await new Promise(resolve => setTimeout(resolve, 5000));
             const cartResponse = await fetch('/cart/add.js', {
                 method: 'POST',
                 headers: {

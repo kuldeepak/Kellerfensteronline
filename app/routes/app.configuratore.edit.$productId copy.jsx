@@ -35,7 +35,6 @@ export const action = async ({ request, params }) => {
   const shopifyProductId = formData.get("shopifyProductId");
   const name = formData.get("name");
   const basePrice = parseFloat(formData.get("basePrice") || 0);
-  const sku = formData.get("sku");
 
   try {
     const product = await prisma.product.update({
@@ -44,7 +43,6 @@ export const action = async ({ request, params }) => {
         shopifyProductId,
         name,
         basePrice,
-        sku,
       },
     });
 
@@ -65,7 +63,6 @@ export default function EditProduct() {
     shopifyProductId: product?.shopifyProductId || "",
     name: product?.name || "",
     basePrice: product?.basePrice?.toString() || "0",
-    sku: product?.sku || "",
   });
 
   const isLoading = ["loading", "submitting"].includes(fetcher.state);
@@ -84,7 +81,7 @@ export default function EditProduct() {
     submitData.append("shopifyProductId", formData.shopifyProductId);
     submitData.append("name", formData.name);
     submitData.append("basePrice", formData.basePrice);
-    submitData.append("sku", formData.sku);
+
     fetcher.submit(submitData, { method: "POST" });
   };
 
@@ -155,29 +152,6 @@ export default function EditProduct() {
               Produktname für diese Konfiguration
             </s-text>
           </s-stack>
-
-          <s-stack direction="block" gap="tight">
-            <s-text variant="headingSm">SKU</s-text>
-            <input
-              type="text"
-              value={formData.sku}
-              onChange={(e) =>
-                setFormData({ ...formData, sku: e.target.value })
-              }
-              placeholder="ABC-123"
-              style={{
-                width: "100%",
-                padding: "8px 12px",
-                border: "1px solid #c9cccf",
-                borderRadius: "4px",
-                fontSize: "14px",
-              }}
-            />
-            <s-text variant="bodySm" tone="subdued">
-              Interne Artikelnummer (SKU)
-            </s-text>
-          </s-stack>
-
 
           <s-stack direction="block" gap="tight">
             <s-text variant="headingSm">Grundpreis (€)</s-text>

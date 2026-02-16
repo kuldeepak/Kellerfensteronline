@@ -44,6 +44,7 @@ model Product {
   shopifyProductId String  @unique
   name            String
   basePrice       Float    @default(0)
+  sku               String?
   
   // Relations
   steps           ConfigurationStep[]

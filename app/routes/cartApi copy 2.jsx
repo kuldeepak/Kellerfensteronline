@@ -151,7 +151,6 @@ export const action = async ({ request }) => {
 
     descriptionHTML += `</ul>`;
     descriptionHTML += `<p><strong>Berechneter Preis:</strong> ${calculatedPrice.toFixed(2)}</p>`;
-    if (product.sku) { descriptionHTML += `<p><strong>SKU:</strong> ${product.sku}</p>`; }
     descriptionHTML += `<p><em>Dieses Produkt wurde automatisch basierend auf Ihrer Konfiguration erstellt.</em></p>`;
 
     // ============================================
@@ -225,7 +224,7 @@ export const action = async ({ request }) => {
       mutation {
         inventoryItemUpdate(
           id: "${variant.inventoryItem.id}",
-          input: { tracked: true , sku : "${product.sku ? product.sku : ''}", }
+          input: { tracked: true }
         ) {
           userErrors { message }
         }
