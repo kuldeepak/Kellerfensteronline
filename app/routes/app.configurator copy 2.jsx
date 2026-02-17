@@ -35,79 +35,6 @@ export const action = async ({ request }) => {
       return json({ success: true });
     }
 
-
-    // ============================================
-    // DUPLICATE PRODUCT
-    // ============================================
-    if (actionType === "duplicateProduct") {
-      const productId = formData.get("productId");
-
-      const originalProduct = await prisma.product.findUnique({
-        where: { id: productId },
-        include: {
-          steps: {
-            include: {
-              options: true,
-            },
-          },
-          priceMatrices: true,
-        },
-      });
-
-      if (!originalProduct) {
-        return json({ success: false, error: "Product not found" }, { status: 404 });
-      }
-
-      const newProduct = await prisma.product.create({
-        data: {
-          name: `${originalProduct.name} (Copy)`,
-          shopifyProductId: `${originalProduct.shopifyProductId}-copy-${Date.now()}`, // must be unique
-          basePrice: originalProduct.basePrice,
-          sku: originalProduct.sku,
-
-          steps: {
-            create: originalProduct.steps.map((step) => ({
-              key: step.key, // safe because new product
-              type: step.type,
-              title: step.title,
-              subtitle: step.subtitle,
-              description: step.description,
-              image: step.image,
-              order: step.order,
-              widthMin: step.widthMin,
-              widthMax: step.widthMax,
-              heightMin: step.heightMin,
-              heightMax: step.heightMax,
-
-              options: {
-                create: step.options.map((option) => ({
-                  value: option.value,
-                  label: option.label,
-                  description: option.description,
-                  image: option.image,
-                  price: option.price,
-                  showSteps: option.showSteps,
-                })),
-              },
-            })),
-          },
-
-          priceMatrices: {
-            create: originalProduct.priceMatrices.map((matrix) => ({
-              widthMin: matrix.widthMin,
-              widthMax: matrix.widthMax,
-              heightMin: matrix.heightMin,
-              heightMax: matrix.heightMax,
-              price: matrix.price,
-            })),
-          },
-        },
-      });
-
-      return json({ success: true, duplicated: true, product: newProduct });
-    }
-
-
     return json({ success: false, error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Action Error:", error);
@@ -141,13 +68,10 @@ export default function Configurator() {
 
   useEffect(() => {
     if (fetcher.data?.success) {
-      if (fetcher.data.duplicated) {
-        shopify.toast.show("Produkt erfolgreich dupliziert");
-      } else {
-        shopify.toast.show("Produkt erfolgreich gelöscht");
-      }
-
-      setRefreshKey(prev => prev + 1);
+      shopify.toast.show("Produkt erfolgreich gelöscht");
+      // window.location.reload();
+      // revalidator.revalidate();
+      setRefreshKey(prev => prev + 1); // Trigger refetch
     } else if (fetcher.data?.error) {
       shopify.toast.show(`Error: ${fetcher.data.error}`);
     }
@@ -169,15 +93,6 @@ export default function Configurator() {
       fetcher.submit(submitData, { method: "POST" });
     }
   };
-
-  const handleDuplicateProduct = (productId) => {
-    const submitData = new FormData();
-    submitData.append("action", "duplicateProduct");
-    submitData.append("productId", productId);
-
-    fetcher.submit(submitData, { method: "POST" });
-  };
-
 
   return (
     <s-page heading="Produkt-Konfigurator">
@@ -220,12 +135,6 @@ export default function Configurator() {
                     }}
                   >
                     <s-heading>{product.name}</s-heading>
-                    <s-button
-                      variant="secondary"
-                      onClick={() => handleDuplicateProduct(product.id)}
-                    >
-                      Produkt duplizieren
-                    </s-button>
                     <s-button
                       variant="tertiary"
                       tone="critical"
