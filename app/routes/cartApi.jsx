@@ -134,6 +134,9 @@ export const action = async ({ request }) => {
             if (option.description) {
               descriptionHTML += ` - ${option.description}`;
             }
+            if (option.sku) {                                    // ADD THIS
+              descriptionHTML += ` (SKU: ${option.sku})`;       // ADD THIS
+            }
             descriptionHTML += `</li>`;
           }
         }

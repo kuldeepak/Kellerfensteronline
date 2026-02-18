@@ -127,7 +127,6 @@ export const action = async ({ request, params }) => {
       const description = formData.get("description") || "";
       const image = formData.get("image") || "";
       const price = parseFloat(formData.get("price") || 0);
-      const sku = formData.get("sku") || "";
       const showSteps = formData.get("showSteps") || null;
 
       const option = await prisma.stepOption.create({
@@ -138,7 +137,6 @@ export const action = async ({ request, params }) => {
           description,
           image,
           price,
-          sku,
           showSteps,
         },
       });
@@ -156,7 +154,6 @@ export const action = async ({ request, params }) => {
       const description = formData.get("description") || "";
       const image = formData.get("image") || "";
       const price = parseFloat(formData.get("price") || 0);
-      const sku = formData.get("sku") || "";
       const showSteps = formData.get("showSteps") || null;
 
       const option = await prisma.stepOption.update({
@@ -167,7 +164,6 @@ export const action = async ({ request, params }) => {
           description,
           image,
           price,
-          sku,
           showSteps,
         },
       });
@@ -242,7 +238,6 @@ export default function ConfigureProduct() {
     description: "",
     image: "",
     price: "0",
-    sku: "",
     showSteps: "",
   });
 
@@ -285,7 +280,6 @@ export default function ConfigureProduct() {
       description: "",
       image: "",
       price: "0",
-      sku: "",
       showSteps: "",
     });
   };
@@ -381,7 +375,6 @@ export default function ConfigureProduct() {
       description: option.description || "",
       image: option.image || "",
       price: option.price.toString(),
-      sku: option.sku || "",
       showSteps: option.showSteps || "",
     });
 
@@ -426,7 +419,6 @@ export default function ConfigureProduct() {
     submitData.append("description", optionFormData.description);
     submitData.append("image", optionFormData.image);
     submitData.append("price", optionFormData.price);
-    submitData.append("sku", optionFormData.sku);
     submitData.append("showSteps", optionFormData.showSteps);
 
     fetcher.submit(submitData, { method: "POST" });
@@ -1053,11 +1045,6 @@ export default function ConfigureProduct() {
                                       Value: {option.value}
                                     </s-text>
 
-                                    {option.sku && (
-                                      <s-text variant="bodySm" tone="subdued" style={{ fontFamily: 'monospace', fontSize: '12px', display: 'block', marginBottom: '6px' }}>
-                                        SKU: {option.sku}
-                                      </s-text>
-                                    )}
                                     {option.description && (
                                       <s-text variant="bodySm" style={{ display: 'block', marginBottom: '6px' }}>
                                         {option.description}
@@ -1162,28 +1149,6 @@ export default function ConfigureProduct() {
                                     onChange={(e) => setOptionFormData({ ...optionFormData, value: e.target.value.toLowerCase().replace(/\s/g, '_') })}
                                     placeholder="e.g., standard_window"
                                     required
-                                    style={{
-                                      width: '95%',
-                                      padding: '10px 12px',
-                                      border: '1px solid #c9cccf',
-                                      borderRadius: '6px',
-                                      marginTop: '6px',
-                                      fontSize: '14px',
-                                      fontFamily: 'monospace'
-                                    }}
-                                  />
-                                </div>
-
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px' }}>
-                                    <s-text variant="bodySm"><strong>SKU</strong> (Optional)</s-text>
-                                  </label>
-                                  <s-text variant="bodySm" tone="subdued">Artikelnummer für diese Auswahl</s-text>
-                                  <input
-                                    type="text"
-                                    value={optionFormData.sku}
-                                    onChange={(e) => setOptionFormData({ ...optionFormData, sku: e.target.value })}
-                                    placeholder="e.g., SKU-12345"
                                     style={{
                                       width: '95%',
                                       padding: '10px 12px',
