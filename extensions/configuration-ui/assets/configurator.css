@@ -980,3 +980,7 @@ label.option-card input {
 .shopify-block.shopify-app-block {
     width: 100%;
 }
+
+.min-h-screen {
+    overflow: visible;
+}
